@@ -763,28 +763,6 @@
             font-size: 0.9em;
             opacity: 0.8;
         }
-        /* Адаптивность */
-        @media (max-width: 768px) {
-            .cards-grid, .battle-deck, .quests-grid {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            }
-            .filters-grid {
-                grid-template-columns: 1fr;
-            }
-            .nav-tabs {
-                flex-wrap: wrap;
-            }
-            .nav-tab {
-                margin: 5px;
-                flex: 1;
-                min-width: 120px;
-                text-align: center;
-            }
-            .arena {
-                grid-template-columns: 1fr;
-            }
-        }
-
         /* Стили для модального окна аутентификации */
         .auth-modal {
             position: fixed;
@@ -850,6 +828,27 @@
             color: #00ff88;
             text-align: center;
             margin-top: 10px;
+        }
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .cards-grid, .battle-deck, .quests-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+            .nav-tab {
+                margin: 5px;
+                flex: 1;
+                min-width: 120px;
+                text-align: center;
+            }
+            .arena {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -2088,23 +2087,25 @@
                 const userBalance = DataManager.getUserBalance();
                 const collection = DataManager.getCollection();
                 const stats = DataManager.getPlayerStats();
-                const winRate = stats.totalBattles > 0 ? Math.round((stats.totalWins / stats.totalBattles) * 100) : 0;
+                const achievements = DataManager.getAchievements();
                 
                 document.getElementById('profile-name').textContent = DataManager.getUsername(); // Используем имя из DataManager
                 document.getElementById('profile-level').textContent = userLevel;
                 document.getElementById('profile-balance').textContent = userBalance;
                 document.getElementById('profile-total-wins').textContent = stats.totalWins;
                 document.getElementById('profile-total-losses').textContent = stats.totalLosses;
-                document.getElementById('profile-win-rate').textContent = winRate + '%';
                 document.getElementById('profile-total-battles').textContent = stats.totalBattles;
+                
+                const winRate = stats.totalBattles > 0 ? Math.round((stats.totalWins / stats.totalBattles) * 100) : 0;
+                document.getElementById('profile-win-rate').textContent = winRate + '%';
+                
                 document.getElementById('profile-current-streak').textContent = stats.currentStreak;
                 document.getElementById('profile-best-streak').textContent = stats.bestStreak;
                 document.getElementById('profile-collection-count').textContent = collection.length;
                 
-                this.renderAchievements();
+                this.renderAchievements(achievements);
             }
-            renderAchievements() {
-                const achievements = DataManager.getAchievements();
+            renderAchievements(achievements) {
                 const container = document.getElementById('achievements-grid');
                 const achievementList = [
                     { id: 'firstWin', icon: '🏆', name: 'Первая победа', description: 'Одержите первую победу' },
@@ -2133,6 +2134,7 @@
                 document.getElementById('save-profile-name').addEventListener('click', () => {
                     const newName = document.getElementById('edit-profile-name').value.trim();
                     if (newName) {
+                        // !!! ТУТ НУЖНО ВЫЗВАТЬ API для обновления имени на сервере !!!
                         DataManager.updateUsername(newName);
                         alert('Имя пользователя обновлено!');
                     } else {
@@ -2148,7 +2150,7 @@
                 this.init();
             }
             init() {
-                // Ничего не делаем, так как вся статистика теперь в профиле
+                // Ничего не делаем, так как статистика теперь в профиле
             }
             updateStats(won) {
                 const stats = DataManager.getPlayerStats();
@@ -2198,7 +2200,7 @@
 
                 if (updated) {
                     DataManager.updateAchievements(achievements);
-                    profileManager.renderAchievements(); // Обновляем достижения в профиле
+                    profileManager.renderAchievements(achievements); // Обновляем достижения в профиле
                 }
             }
             showAchievementNotification(name, icon) {
