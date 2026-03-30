@@ -1105,29 +1105,33 @@
                 localStorage.removeItem('authToken');
             }
 
-            static async register(email, password) {
-                try {
-                    const response = await fetch(`${API_BASE_URL}/auth/register`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ email, password }),
-                    });
+          static async register(email, password) {
+    // Получаем значение из поля подтверждения пароля
+    const confirmPassword = document.getElementById('auth-confirm-password').value;
 
-                    const data = await response.json();
-                    if (response.ok) {
-                        this.setAuthToken(data.token);
-                        DataManager.updateUserDataLocally(data.user); // Обновляем локальные данные
-                        return { success: true, message: data.message };
-                    } else {
-                        return { success: false, message: data.error || 'Ошибка регистрации' };
-                    }
-                } catch (error) {
-                    console.error('Ошибка регистрации:', error);
-                    return { success: false, message: 'Ошибка подключения к серверу' };
-                }
-            }
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            // Теперь отправляем все три поля:
+            body: JSON.stringify({ email, password, confirmPassword }), // <-- Добавлен confirmPassword
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            this.setAuthToken(data.token);
+            DataManager.updateUserDataLocally(data.user);
+            return { success: true, message: data.message };
+        } else {
+            return { success: false, message: data.error || 'Ошибка регистрации' };
+        }
+    } catch (error) {
+        console.error('Ошибка регистрации:', error);
+        return { success: false, message: 'Ошибка подключения к серверу' };
+    }
+}
 
             static async login(email, password) {
                 try {
