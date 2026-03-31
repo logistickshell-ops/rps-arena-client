@@ -1105,15 +1105,17 @@
             }
 
 static async register(email, password, playerName) {
+    // Получаем значение из поля подтверждения пароля
+    const confirmPassword = document.getElementById('auth-confirm-password').value;
+
     try {
-        // Проблема: confirmPassword не передаётся
         const response = await fetch(`${API_BASE_URL}/auth/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            // Вот здесь проблема:
-            body: JSON.stringify({ email, password, playerName }), // <-- confirmPassword отсутствует
+            // Теперь отправляем все четыре поля:
+            body: JSON.stringify({ email, password, playerName, confirmPassword }), // <-- Добавлен confirmPassword
         });
 
         const data = await response.json();
@@ -1129,6 +1131,7 @@ static async register(email, password, playerName) {
         return { success: false, message: 'Ошибка подключения к серверу' };
     }
 }
+            
             static async login(email, password) {
                 try {
                     const response = await fetch(`${API_BASE_URL}/auth/login`, {
