@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Камень Ножницы Бумага</title>
+    <title>Crypto Arena - Упрощённая версия</title>
     <style>
         * {
             margin: 0;
@@ -53,6 +53,20 @@
         }
         .currency-icon {
             color: #ffaa00;
+        }
+        .logout-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ffa726);
+            color: #1a1a2e;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
         }
         /* Навигация */
         .nav-tabs {
@@ -360,7 +374,7 @@
             border-color: #00ff88;
         }
         .ai-side {
-            border-color: #ff4444;
+            border4444;
         }
         .side-label {
             position: absolute;
@@ -384,8 +398,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px dashed rgba(255, 255, 255, 0.3);
-            border-radius: 15px;
+            border: 2px dashed rgba(255, 255, 255, 0.3: 15px;
             margin-top: 30px;
         }
         .battle-card {
@@ -656,8 +669,7 @@
             color: #1a1a2e;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
-        }
+            transition: all 0.        }
         .quest-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
@@ -780,6 +792,7 @@
                 <div class="user-level">
                     Уровень: <span id="user-level">1</span>
                 </div>
+                <button class="logout-btn" id="logout-btn">Выйти</button>
             </div>
         </div>
         <div class="nav-tabs">
@@ -815,10 +828,9 @@
                             <option value="rock">🪨 Камень</option>
                             <option value="scissors">✂️ Ножницы</option>
                             <option value="paper">📄 Бумага</option>
-                        </select>
-                    </div>
+                        </div>
                     <div class="filter-group">
-                        <div class="filter-label">Стихия</div>
+                        <div class="filterхия</div>
                         <select class="filter-select" id="filter-element">
                             <option value="all">Все стихии</option>
                             <option value="fire">🔥 Огонь</option>
@@ -940,7 +952,7 @@
                         <div class="profile-stat-label">Побед</div>
                     </div>
                     <div class="profile-stat-card">
-                        <div class="profile-stat-number" id="profile-total-losses">0</div>
+                        <div class="profile-stat-number" id="profile0</div>
                         <div class="profile-stat-label">Поражений</div>
                     </div>
                     <div class="profile-stat-card">
@@ -977,8 +989,39 @@
         </div>
     </div>
     <script>
-        // ==================== СИСТЕМА ХРАНЕНИЯ ДАННЫХ ====================
-        class DataManager {
+        // ==================== ГЕНЕРАТОР КАРТОЧЕК ====================
+        class CardGenerator {
+            static names = {
+                rock: ['Гранитный воин', 'Базальтовый титан', 'Обсидиановый страж', 'Мраморный гигант', 'Лавовый защитник'],
+                scissors: ['Стальные клинки', 'Бритвенные леза', 'Вихревые резаки', 'Металлические кусачки', 'Острые ножи'],
+                paper: ['Свиток мудрости', 'Древний манускрипт', 'Магический пергамент', 'Бумажный ураган', 'Таинственный свиток']
+            };
+            static elements = ['fire', 'water', 'earth', 'air'];
+            static generateCard(id) {
+                const types = ['rock', 'scissors', 'paper'];
+                const type = types[Math.floor(Math.random() * types.length)];
+                const element = this.elements[Math.floor(Math.random() * this.elements.length)];
+                const level = Math.floor(Math.random() * 3) + 1; // 1, 2, 3
+                const name = this.names[type][Math.floor(Math.random() * this.names[type].length)];
+                const price = 10 * level; // Цена зависит от уровня
+                return { id, name, type, element, level, price };
+            }
+            static generateAllCards() {
+                const cards = [];
+                let id = 1;
+                for (const type of ['rock', 'scissors', 'paper']) {
+                    for (const element of this.elements) {
+                        for (let level = 1; level <= 3; level++) {
+                            const name = `${this.names[type][Math.floor(Math.random() * this.names[type].length)]} Lvl${level}`;
+                            const price = 10 * level;
+                            cards.push({ id: id++, name, type, element, level, price });
+                        }
+                    }
+                }
+                return cards;
+            }
+        }
+        // ==================== СИСТЕМА ХРАНЕНИЯ ДАННЫ class DataManager {
             static initialize() {
                 // Проверяем, авторизован ли пользователь
                 if (!this.isAuthenticated()) {
@@ -994,8 +1037,7 @@
             static showAuthOverlay() {
                 document.getElementById('auth-overlay').style.display = 'flex';
                 document.getElementById('auth-title').textContent = 'Вход в игру';
-                document.getElementById('auth-subtitle').textContent = 'Введите свои данные';
-                document.getElementById('auth-confirm-password').style.display = 'none';
+                document.getElementById('auth-subtitle').textContent = 'Введите свои данные('auth-confirm-password').style.display = 'none';
                 document.getElementById('auth-submit-btn').textContent = 'Войти';
                 document.getElementById('auth-toggle-text').textContent = 'Еще не зарегистрированы?';
                 document.getElementById('auth-toggle-link').textContent = 'Зарегистрироваться';
@@ -1034,26 +1076,18 @@
             static handleRegister() {
                 const email = document.getElementById('auth-email').value;
                 const password = document.getElementById('auth-password').value;
-                // --- ИСПРАВЛЕНО: Получаем значение подтверждения пароля ---
                 const confirmPassword = document.getElementById('auth-confirm-password').value;
-                // --- /ИСПРАВЛЕНО ---
-
-                // --- ИСПРАВЛЕНО: Проверяем совпадение паролей КЛИЕНТСКИ ---
                 if (password !== confirmPassword) {
                     document.getElementById('auth-error').textContent = 'Пароли не совпадают';
-                    return; // Прерываем выполнение, если совпадают
+                    return;
                 }
-                // --- /ИСПРАВЛЕНО ---
-
-                // Заглушка для API-вызова - теперь отправляем confirmPassword
+                // Заглушка для API-вызова
                 fetch('https://rps-arena-server.onrender.com/api/auth/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    // --- ИСПРАВЛЕНО: Передаем confirmPassword ---
                     body: JSON.stringify({ email, password, confirmPassword })
-                    // --- /ИСПРАВЛЕНО ---
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -1061,9 +1095,8 @@
                         localStorage.setItem('authToken', data.token);
                         document.getElementById('auth-error').textContent = '';
                         document.getElementById('auth-overlay').style.display = 'none';
-                        this.loadUserData(); // Загружаем данные пользователя после успешной регистрации
+                        this.loadUserData();
                     } else {
-                        // Сервер может вернуть ошибку, например, если email занят
                         document.getElementById('auth-error').textContent = data.error || 'Ошибка регистрации';
                     }
                 })
@@ -1084,9 +1117,13 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.id) {
-                        document.getElementById('user-balance').textContent = data.balance;
-                        document.getElementById('user-level').textContent = data.level;
+                        document.getElementById('user-balance').textContent = data.balance || 1000;
+                        document.getElementById('user-level').textContent = data.level || 1;
+                        document.getElementById('profile-name').textContent = data.email || 'Игрок';
+                        document.getElementById('profile-balance').textContent = data.balance || 1000;
+                        document.getElementById('profile-level').textContent = data.level || 1;
                         // Загружаем остальные данные...
+                        this.updateLocalStorageData(data);
                     } else {
                         // Если токен невалиден, показываем окно входа
                         localStorage.removeItem('authToken');
@@ -1100,48 +1137,807 @@
                     this.showAuthOverlay();
                 });
             }
+            static updateLocalStorageData(serverData) {
+                // Сохраняем данные в localStorage для использования в других частях игры
+                localStorage.setItem('userBalance', serverData.balance || 1000);
+                localStorage.setItem('userLevel', serverData.level || 1);
+                localStorage.setItem('nftCollection', JSON.stringify(serverData.inventory || []));
+                localStorage.setItem('battleDeck', JSON.stringify(serverData.deck || []));
+                localStorage.setItem('playerStats', JSON.stringify({
+                    totalWins: serverData.stats?.totalWins || 0,
+                    totalLosses: serverData.stats?.totalLosses || 0,
+                    totalBattles: serverData.stats?.totalBattles || 0
+                }));
+                // Заглушка для ежедневных заданий
+                if (serverData.dailyQuests) {
+                    localStorage.setItem('dailyQuests', JSON.stringify(serverData.dailyQuests));
+                }
+            }
+            static getUserBalance() {
+                return parseInt(localStorage.getItem('userBalance') || '1000');
+            }
+            static updateUserBalance(newBalance) {
+                localStorage.setItem('userBalance', newBalance.toString());
+                document.getElementById('user-balance').textContent = newBalance;
+            }
+            static getUserLevel() {
+                return parseInt(localStorage.getItem('userLevel') || '1');
+            }
+            static getCollection() {
+                const collection = JSON.parse(localStorage.getItem('nftCollection') || '[]');
+                return collection.map(cardData => {
+                    return {
+                        ...cardData,
+                        getTypeEmoji: function() {
+                            const emojis = { 'rock': '🪨', 'scissors': '✂️', 'paper': '📄' };
+                            return emojis[this.type] || '❓';
+                        },
+                        getTypeName: function() {
+                            const names = { 'rock': 'Камень', 'scissors': 'Ножницы', 'paper': 'Бумага' };
+                            return names[this.type] || this.type;
+                        },
+                        getElementEmoji: function() {
+                            const emojis = { 'fire': '🔥', 'water': '💧', 'earth': '🌍', 'air': '💨' };
+                            return emojis[this.element] || '🌟';
+                        },
+                        getElementName: function() {
+                            const names = { 'fire': 'Огонь', 'water': 'Вода', 'earth': 'Земля', 'air': 'Воздух' };
+                            return names[this.element] || this.element;
+                        },
+                        isInCollection: function() { return true; }, // В коллекции
+                        isInBattleDeck: function() { 
+                            const battleDeck = this.getBattleDeck();
+                            return battleDeck.some(c => c.id === this.id);
+                        },
+                        getBattleDeck: function() {
+                            return JSON.parse(localStorage.getItem('battleDeck') || '[]');
+                        }
+                    };
+                });
+            }
+            static addToCollection(card) {
+                const collection = this.getCollection();
+                if (!collection.find(c => c.id === card.id)) {
+                    collection.push(card);
+                    localStorage.setItem('nftCollection', JSON.stringify(collection));
+                    return true;
+                }
+                return false;
+            }
+            static removeFromCollection(cardId) {
+                const collection = this.getCollection();
+                const newCollection = collection.filter(c => c.id !== cardId);
+                localStorage.setItem('nftCollection', JSON.stringify(newCollection));
+                this.removeFromBattleDeck(cardId);
+            }
+            static getBattleDeck() {
+                return JSON.parse(localStorage.getItem('battleDeck') || '[]');
+            }
+            static addToBattleDeck(card) {
+                const battleDeck = this.getBattleDeck();
+                if (battleDeck.length >= 5) {
+                    return false;
+                }
+                if (!battleDeck.find(c => c.id === card.id)) {
+                    battle                    localStorage.setItem('battleDeck', JSON.stringify(battleDeck));
+                    return true;
+                }
+                return false;
+            }
+            static removeFromBattleDeck(cardId) {
+                const battleDeck = this.getBattleDeck();
+                const newDeck = battleDeck.filter(c => c.id !== cardId);
+                localStorage.setItem('battleDeck', JSON.stringify(newDeck));
+            }
+            static getDailyQuests() {
+                return JSON.parse(localStorage.getItem('dailyQuests') || '{"quests": [], "lastClaimedDate": null}');
+            }
+            static updateDailyQuests(questsData) {
+                localStorage.setItem('dailyQuests', JSON.stringify(questsData));
+            }
             static logout() {
                 localStorage.removeItem('authToken');
+                localStorage.removeItem('userBalance');
+                localStorage.removeItem('userLevel');
+                localStorage.removeItem('nftCollection');
+                localStorage.removeItem('battleDeck');
+                localStorage.removeItem('playerStats');
+                localStorage.removeItem('dailyQuests');
                 this.showAuthOverlay();
             }
         }
-        // ==================== ИНИЦИАЛИЗАЦИЯ ====================
-        document.addEventListener('DOMContentLoaded', () => {
-            // Настройка переключения между входом и регистрацией
-            document.getElementById('auth-toggle-link').addEventListener('click', () => {
-                const isLogin = document.getElementById('auth-submit-btn').textContent === 'Войти';
-                if (isLogin) {
-                    // Переключаем на регистрацию
-                    document.getElementById('auth-title').textContent = 'Регистрация';
-                    document.getElementById('auth-subtitle').textContent = 'Создайте новый аккаунт';
-                    document.getElementById('auth-confirm-password').style.display = 'block';
-                    document.getElementById('auth-submit-btn').textContent = 'Зарегистрироваться';
-                    document.getElementById('auth-toggle-text').textContent = 'Уже есть аккаунт?';
-                    document.getElementById('auth-toggle-link').textContent = 'Войти';
-                    document.getElementById('auth-form').onsubmit = (e) => {
-                        e.preventDefault();
-                        DataManager.handleRegister();
-                    };
+        // ==================== СИСТЕМА ФИЛЬТРОВ ====================
+        class FilterSystem {
+            constructor() {
+                this.filters = {
+                    type: 'all',
+                    element: 'all',
+                    level: 'all',
+                    search: ''
+                };
+            }
+            applyFilters(cards) {
+                return cards.filter(card => {
+                    if (this.filters.type !== 'all' && card.type !== this.filters.type) return false;
+                    if (this.filters.element !== 'all' && card.element !== this.filters.element) return false;
+                    if (this.filters.level !== 'all' && card.level != this.filters.level) return false;
+                    if (this.filters.search) {
+                        const searchTerm = this.filters.search.toLowerCase();
+                        const cardText = card.name.toLowerCase();
+                        if (!cardText.includes(searchTerm)) return false;
+                    }
+                    return true;
+                });
+            }
+            updateFilter(type, value) {
+                this.filters[type] = value;
+            }
+            resetFilters() {
+                this.filters = {
+                    type: 'all',
+                    element: 'all',
+                    level: 'all',
+                    search: ''
+                };
+            }
+        }
+        // ==================== ИНТЕРФЕЙС СКЛАДА ====================
+        class CardWarehouse {
+            constructor() {
+                this.cards = [];
+                this.filterSystem = new FilterSystem();
+                this.filteredCards = [];
+                this.init();
+            }
+            init() {
+                DataManager.initialize();
+                this.generateAllCards(); // Генерируем все возможные карты
+                this.renderCards();
+                this.setupEventListeners();
+                this.updateStats();
+            }
+            generateAllCards() {
+                this.cards = CardGenerator.generateAllCards();
+            }
+            renderCards() {
+                const container = document.getElementById('warehouse-cards-container');
+                this.filteredCards = this.filterSystem.applyFilters(this.cards);
+                container.innerHTML = '';
+                this.filteredCards.forEach(card => {
+                    const cardElement = this.createCardElement(card);
+                    container.appendChild(cardElement);
+                });
+                this.updateStats();
+            }
+            createCardElement(card) {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = `nft-card`;
+                const inCollection = DataManager.getCollection().some(c => c.id === card.id);
+                cardDiv.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-type">
+                            ${card.getTypeEmoji ? card.getTypeEmoji() : '❓'} ${card.name}
+                        </div>
+                    </div>
+                    <div class="card-element">
+                        <span class="element-icon">${card.getElementEmoji ? card.getElementEmoji() : '🌟'}</span>
+                        <span>${card.getElementName ? card.getElementName() : card.element}</span>
+                    </div>
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Уровень:</span>
+                            <span class="stat-value">${'⭐'.repeat(card.level)}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Тип:</span>
+                            <span class="stat-value">${card.getTypeName ? card.getTypeName() : card.type}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">В коллекции:</span>
+                            <span class="stat-value">${inCollection ? '✅' : '❌'}</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-price">
+                            💰 ${card.price} TCR
+                        </div>
+                        <div class="card-actions">
+                            ${inCollection ? 
+                                '<button class="card-btn" onclick="warehouse.removeFromCollection(' + card.id + ')">🗑️ Удалить</button>' :
+                                '<button class="card-btn primary" onclick="warehouse.buyCard(' + card.id + ')">🛒 Купить</button>'
+                            }
+                        </div>
+                    </div>
+                `;
+                return cardDiv;
+            }
+            updateStats() {
+                document.getElementById('total-cards').textContent = this.cards.length;
+                const uniqueCards = new Set(this.cards.map(card => card.name)).size;
+                document.getElementById('unique-cards').textContent = uniqueCards;
+            }
+            setupEventListeners() {
+                document.getElementById('apply-filters').addEventListener('click', () => {
+                    this.applyCurrentFilters();
+                });
+                document.getElementById('reset-filters').addEventListener('click', () => {
+                    this.resetFilters();
+                });
+                document.querySelector('.search-input').addEventListener('input', (e) => {
+                    this.filterSystem.updateFilter('search', e.target.value);
+                });
+                ['type', 'element', 'level'].forEach(filterType => {
+                    document.getElementById(`filter-${filterType}`).addEventListener('change', (e) => {
+                        this.filterSystem.updateFilter(filterType, e.target.value);
+                    });
+                });
+            }
+            applyCurrentFilters() {
+                this.renderCards();
+            }
+            resetFilters() {
+                this.filterSystem.resetFilters();
+                document.querySelector('.search-input').value = '';
+                document.getElementById('filter-type').value = 'all';
+                document.getElementById('filter-element').value = 'all';
+                document.getElementById('filter-level').value = 'all';
+                this.renderCards();
+            }
+            buyCard(cardId) {
+                const card = this.cards.find(c => c.id === cardId);
+                if (card) {
+                    const userBalance = DataManager.getUserBalance();
+                    if (userBalance >= card.price) {
+                        if (DataManager.addToCollection(card)) {
+                            DataManager.updateUserBalance(userBalance - card.price);
+                            this.renderCards();
+                            collectionManager.renderCollection();
+                            // Обновляем задания
+                            if (window.dailyQuestsManager) {
+                                dailyQuestsManager.updateQuestProgress('buy_card');
+                            }
+                            alert(`🎉 Карта "${card.name}" добавлена в вашу коллекцию!`);
+                        }
+                    } else {
+                        alert(`❌ Недостаточно средств! Требуется: ${card.price} TCR, у вас: ${userBalance} TCR`);
+                    }
+                }
+            }
+            removeFromCollection(cardId) {
+                DataManager.removeFromCollection(cardId);
+                this.renderCards();
+                collectionManager.renderCollection();
+                if (window.battleManager) {
+                    battleManager.updateBattleDeck();
+                }
+            }
+        }
+        // ==================== МЕНЕДЖЕР КОЛЛЕКЦИИ ====================
+        class CollectionManager {
+            constructor() {
+                this.collection = [];
+            }
+            renderCollection() {
+                this.collection = DataManager.getCollection();
+                const container = document.getElementById('collection-cards-container');
+                container.innerHTML = '';
+                this.collection.forEach(card => {
+                    const cardElement = this.createCardElement(card);
+                    container.appendChild(cardElement);
+                });
+                this.updateStats();
+            }
+            createCardElement(card) {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = `nft-card`;
+                const inBattleDeck = DataManager.getBattleDeck().some(c => c.id === card.id);
+                cardDiv.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-type">
+                            ${card.getTypeEmoji()} ${card.name}
+                        </div>
+                    </div>
+                    <div class="card-element">
+                        <span class="element-icon">${card.getElementEmoji()}</span>
+                        <span>${card.getElementName()}</span>
+                    </div>
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Уровень:</span>
+                            <span class="stat-value">${'⭐'.repeat(card.level)}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Тип:</span>
+                            <span class="stat-value">${card.getTypeName()}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">В колоде:</span>
+                            <span class="stat-value">${inBattleDeck ? '✅' : '❌'}</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-actions">
+                            ${inBattleDeck ? 
+                                '<button class="card-btn" onclick="collectionManager.removeFromBattleDeck(' + card.id + ')">➖ Из колоды</button>' :
+                                '<button class="card-btn primary" onclick="collectionManager.addToBattleDeck(' + card.id + ')">➕ В колоду</button>'
+                            }
+                        </div>
+                    </div>
+                `;
+                return cardDiv;
+            }
+            updateStats() {
+                const collection = DataManager.getCollection();
+                const battleDeck = DataManager.getBattleDeck();
+                document.getElementById('collection-total').textContent = collection.length;
+                document.getElementById('collection-battle').textContent = battleDeck.length;
+            }
+            addToBattleDeck(cardId) {
+                const collection = DataManager.getCollection();
+                const card = collection.find(c => c.id === cardId);
+                if (card && DataManager.addToBattleDeck(card)) {
+                    this.renderCollection();
+                    if (window.battleManager) {
+                        battleManager.updateBattleDeck();
+                    }
+                    alert(`🃏 Карта "${card.name}" добавлена в боевую колоду!`);
                 } else {
-                    // Переключаем на вход
-                    document.getElementById('auth-title').textContent = 'Вход в игру';
-                    document.getElementById('auth-subtitle').textContent = 'Введите свои данные';
-                    document.getElementById('auth-confirm-password').style.display = 'none';
-                    document.getElementById('auth-submit-btn').textContent = 'Войти';
-                    document.getElementById('auth-toggle-text').textContent = 'Еще не зарегистрированы?';
-                    document.getElementById('auth-toggle-link').textContent = 'Зарегистрироваться';
-                    document.getElementById('auth-form').onsubmit = (e) => {
-                        e.preventDefault();
-                        DataManager.handleLogin();
-                    };
+                    alert('❌ В боевой колоде может быть не более 5 карт!');
+                }
+            }
+            removeFromBattleDeck(cardId) {
+                DataManager.removeFromBattleDeck(cardId);
+                this.renderCollection();
+                if (window.battleManager) {
+                    battleManager.updateBattleDeck();
+                }
+            }
+        }
+        // ==================== СИСТЕМА ЕЖЕДНЕВНЫХ ЗАДАНИЙ ====================
+        class DailyQuestsManager {
+            constructor() {
+                this.quests = [];
+                this.init();
+            }
+            init() {
+                this.loadQuestsFromJson();
+                this.loadPlayerProgress();
+            }
+            async loadQuestsFromJson() {
+                // Заглушка: используем фиксированный список заданий
+                this.quests = [
+                    {
+                        id: 'battle_1',
+                        title: 'Выиграть 1 бой',
+                        description: 'Сыграйте и выиграйте хотя бы один бой на арене',
+                        target: 1,
+                        current: 0,
+                        completed: false,
+                        rewards: [
+                            { type: 'currency', amount: 50 },
+                            { type: 'card', rarity: 'common' }
+                        ]
+                    },
+                    {
+                        id: 'battle_3',
+                        title: 'Выиграть 3 боя',
+                        description: 'Выиграйте 3 боя в общей сложности',
+                        target: 3,
+                        current: 0,
+                        completed: false,
+                        rewards: [
+                            { type: 'currency', amount: 150 },
+                            { type: 'card', rarity: 'rare' }
+                        ]
+                    },
+                    {
+                        id: 'buy_card',
+                        title: 'Купить 1 карту',
+                        description: 'Покупите любую карту на складе',
+                        target: 1,
+                        current: 0,
+                        completed: false,
+                        rewards: [
+                            { type: 'currency', amount: 75 },
+                            { type: 'card', rarity: 'common' }
+                        ]
+                    }
+                ];
+                this.renderQuests();
+            }
+            loadPlayerProgress() {
+                const savedProgress = DataManager.getDailyQuests();
+                if (savedProgress && savedProgress.quests) {
+                    savedProgress.quests.forEach(savedQuest => {
+                        const quest = this.quests.find(q => q.id === savedQuest.id);
+                        if (quest) {
+                            quest.current = savedQuest.current;
+                            quest.completed = savedQuest.completed;
+                        }
+                    });
+                }
+                this.renderQuests();
+            }
+            updateQuestProgress(questId, amount = 1) {
+                const quest = this.quests.find(q => q.id === questId);
+                if (quest && !quest.completed) {
+                    quest.current = Math.min(quest.current + amount, quest.target);
+                    if (quest.current >= quest.target) {
+                        quest.completed = true;
+                    }
+                    DataManager.updateDailyQuests({ quests: this.quests, lastClaimedDate: DataManager.getDailyQuests().lastClaimedDate || new Date().toDateString() });
+                    this.renderQuests();
+                }
+            }
+            claimReward(questId) {
+                const quest = this.quests.find(q => q.id === questId);
+                if (quest && quest.completed) {
+                    let rewardMessage = `Получены награды за задание "${quest.title}":\n`;
+                    quest.rewards.forEach(reward => {
+                        if (reward.type === 'currency') {
+                            DataManager.updateUserBalance(DataManager.getUserBalance() + reward.amount);
+                            rewardMessage += `💰 ${reward.amount} TCR\n`;
+                        } else if (reward.type === 'card') {
+                            const newCard = CardGenerator.generateCard(Date.now());
+                            newCard.rarity = reward.rarity;
+                            DataManager.addToCollection(newCard);
+                            rewardMessage += `🃏 ${newCard.name} (${newCard.rarity} карта)\n`;
+                        }
+                    });
+                    // Сбросим прогресс задания
+                    quest.current = 0;
+                    quest.completed = false;
+                    DataManager.updateDailyQuests({ quests: this.quests, lastClaimedDate: new Date().toDateString() });
+                    alert(rewardMessage);
+                    this.renderQuests();
+                }
+            }
+            renderQuests() {
+                const container = document.getElementById('quests-grid');
+                if (!container) return;
+                container.innerHTML = '';
+                this.quests.forEach(quest => {
+                    const questCard = document.createElement('div');
+                    questCard.className = `quest-card ${quest.completed ? 'quest-completed' : ''}`;
+                    questCard.innerHTML = `
+                        <h3 class="quest-title">${quest.title}</h3>
+                        <p class="quest-description">${quest.description}</p>
+                        <div class="quest-rewards">
+                            <strong>Награды:</strong>
+                            ${quest.rewards.map(reward =>
+                                `<div class="reward-item">
+                                    ${reward.type === 'currency' ? `💰 ${reward.amount} TCR` : `🃏 ${reward.rarity} карта`}
+                                </div>`
+                            ).join('')}
+                        </div>
+                        <div class="quest-progress">
+                            <div>Прогресс: ${quest.current} / ${quest.target}</div>
+                            <div class="progress-bar-quest">
+                                <div class="progress-fill-quest" style="width: ${(quest.current / quest.target) * 100}%"></div>
+                            </div>
+                        </div>
+                        <button class="quest-btn" ${!quest.completed ? 'disabled' : ''} onclick="dailyQuestsManager.claimReward('${quest.id}')">
+                            ${quest.completed ? 'Получить награду' : 'Задание активно'}
+                        </button>
+                    `;
+                    container.appendChild(questCard);
+                });
+            }
+        }
+        // ==================== СИСТЕМА БОЯ ====================
+        class BattleManager {
+            constructor() {
+                this.playerScore = 0;
+                this.aiScore = 0;
+                this.round = 0;
+                this.isBattleActive = false;
+                this.playerDeck = [];
+                this.aiDeck = [];
+                this.currentPlayerCard = null;
+                this.currentAICard = null;
+                this.gameEnded = false;
+                this.lastPlayerCardType = null;
+                this.init();
+            }
+            init() {
+                this.updateBattleDeck();
+                this.setupEventListeners();
+            }
+            updateBattleDeck() {
+                this.playerDeck = DataManager.getBattleDeck();
+                this.renderBattleDeck();
+            }
+            renderBattleDeck() {
+                const container = document.getElementById('battle-deck');
+                if (!container) return;
+                container.innerHTML = '';
+                this.playerDeck.forEach(card => {
+                    const cardElement = this.createBattleCardElement(card);
+                    container.appendChild(cardElement);
+                });
+                if (this.playerDeck.length === 0) {
+                    container.innerHTML = '<div style="text-align: center; padding: 20px; color: #ff6b6b;">❌ Боевая колода пуста! Добавьте карты из коллекции.</div>';
+                }
+            }
+            createBattleCardElement(card) {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'battle-card';
+                cardDiv.innerHTML = `
+                    <div class="card-type">${card.getTypeEmoji()} ${card.getTypeName()}</div>
+                    <div class="card-element">${card.getElementEmoji()} ${card.getElementName()}</div>
+                    <div class="card-level">⭐ ${card.level}</div>
+                `;
+                cardDiv.addEventListener('click', () => this.selectPlayerCard(card));
+                return cardDiv;
+            }
+            selectPlayerCard(card) {
+                if (!this.isBattleActive || this.currentPlayerCard) return;
+                this.currentPlayerCard = card;
+                this.lastPlayerCardType = card.type;
+                this.renderPlayerCard(card);
+                document.querySelectorAll('.battle-card').forEach(el => {
+                    el.classList.add('disabled');
+                });
+                this.selectAICard();
+                setTimeout(() => this.resolveRound(), 1000);
+            }
+            selectAICard() {
+                // Используем все возможные карты для ИИ
+                const allCards = CardGenerator.generateAllCards();
+                // Определяем карту, которая обыгрывает последнюю карту игрока
+                let counterCardType = null;
+                if (this.lastPlayerCardType) {
+                    if (this.lastPlayerCardType === 'rock') counterCardType = 'paper';
+                    else if (this.lastPlayerCardType === 'scissors') counterCardType = 'rock';
+                    else if (this.lastPlayerCardType === 'paper') counterCardType = 'scissors';
+                }
+                // Фильтруем колоду ИИ по подходящему типу
+                const potentialCards = allCards.filter(card => card.type === counterCardType);
+                // Если нашли подходящие карты, выбираем случайную из них
+                if (potentialCards.length > 0) {
+                    if (Math.random() < 0.7) {
+                        this.currentAICard = potentialCards[Math.floor(Math.random() * potentialCards.length)];
+                    } else {
+                        this.currentAICard = allCards[Math.floor(Math.random() * allCards.length)];
+                    }
+                } else {
+                    this.currentAICard = allCards[Math.floor(Math.random() * allCards.length)];
+                }
+                this.renderAICard(this.currentAICard);
+            }
+            renderPlayerCard(card) {
+                const container = document.getElementById('player-card-slot');
+                if (!container) return;
+                container.innerHTML = `
+                    <div class="battle-card">
+                        <div class="card-type">${card.getTypeEmoji()} ${card.getTypeName()}</div>
+                        <div class="card-element">${card.getElementEmoji()} ${card.getElementName()}</div>
+                        <div class="card-level">⭐ ${card.level}</div>
+                    </div>
+                `;
+            }
+            renderAICard(card) {
+                const container = document.getElementById('ai-card-slot');
+                if (!container) return;
+                container.innerHTML = `
+                    <div class="battle-card">
+                        <div class="card-type">${card.getTypeEmoji()} ${card.getTypeName()}</div>
+                        <div class="card-element">${card.getElementEmoji()} ${card.getElementName()}</div>
+                        <div class="card-level">⭐ ${card.level}</div>
+                    </div>
+                `;
+            }
+            resolveRound() {
+                if (!this.currentPlayerCard || !this.currentAICard) return;
+                let rpsResult = this.determineRPSWinner(
+                    this.currentPlayerCard.type, 
+                    this.currentAICard.type
+                );
+                let roundWinner;
+                if (rpsResult === 'player') {
+                    roundWinner = 'player';
+                    this.playerScore++;
+                } else if (rpsResult === 'ai') {
+                    roundWinner = 'ai';
+                    this.aiScore++;
+                } else {
+                    roundWinner = 'draw';
+                }
+                document.getElementById('player-score').textContent = this.playerScore;
+                document.getElementById('ai-score').textContent = this.aiScore;
+                this.displayRoundResult(roundWinner);
+                this.addRoundLog(roundWinner);
+                if (this.playerScore >= 3 || this.aiScore >= 3) {
+                    this.endGame();
+                } else {
+                    this.prepareNextRound();
+                }
+            }
+            determineRPSWinner(playerType, aiType) {
+                if (playerType === aiType) return 'draw';
+                if (
+                    (playerType === 'rock' && aiType === 'scissors') ||
+                    (playerType === 'scissors' && aiType === 'paper') ||
+                    (playerType === 'paper' && aiType === 'rock')
+                ) {
+                    return 'player';
+                }
+                return 'ai';
+            }
+            displayRoundResult(winner) {
+                const resultMessage = document.getElementById('result-message');
+                if (!resultMessage) return;
+                if (winner === 'player') {
+                    resultMessage.textContent = 'Вы выиграли раунд!';
+                    resultMessage.className = 'result-message win-message';
+                } else if (winner === 'ai') {
+                    resultMessage.textContent = 'ИИ выиграл раунд!';
+                    resultMessage.className = 'result-message lose-message';
+                } else {
+                    resultMessage.textContent = 'Ничья в раунде!';
+                    resultMessage.className = 'result-message';
+                }
+            }
+            addRoundLog(winner) {
+                const logContainer = document.getElementById('battle-log');
+                if (!logContainer) return;
+                let logMessage = `Раунд ${this.round + 1}: `;
+                if (winner === 'player') {
+                    logMessage += 'Вы выиграли!';
+                    this.addLogEntry(logMessage, 'win');
+                } else if (winner === 'ai') {
+                    logMessage += 'ИИ выиграл!';
+                    this.addLogEntry(logMessage, 'lose');
+                } else {
+                    logMessage += 'Ничья!';
+                    this.addLogEntry(logMessage, 'draw');
+                }
+                this.addLogEntry(`Ваша карта: ${this.currentPlayerCard.name}, Карта ИИ: ${this.currentAICard.name}`, 'analysis');
+            }
+            prepareNextRound() {
+                this.round++;
+                this.currentPlayerCard = null;
+                const playerSlot = document.getElementById('player-card-slot');
+                const aiSlot = document.getElementById('ai-card-slot');
+                if (playerSlot) playerSlot.innerHTML = '<div class="card-placeholder">Выберите карту из колоды</div>';
+                if (aiSlot) aiSlot.innerHTML = '<div class="card-placeholder">ИИ выбирает...</div>';
+                document.querySelectorAll('.battle-card').forEach(el => {
+                    el.classList.remove('disabled');
+                });
+            }
+            endGame() {
+                this.gameEnded = true;
+                this.isBattleActive = false;
+                const resultMessage = document.getElementById('result-message');
+                if (!resultMessage) return;
+                if (this.playerScore >= 3) {
+                    resultMessage.textContent = '🎉 Вы выиграли игру!';
+                    resultMessage.className = 'result-message win-message';
+                    this.addLogEntry('Вы выиграли игру!', 'win');
+                    // Награда за победу
+                    const reward = 50;
+                    DataManager.updateUserBalance(DataManager.getUserBalance() + reward);
+                    this.addLogEntry(`Получена награда: ${reward} TCR`, 'win');
+                    // Обновляем задания
+                    if (window.dailyQuestsManager) {
+                        dailyQuestsManager.updateQuestProgress('battle_1');
+                        dailyQuestsManager.updateQuestProgress('battle_3');
+                    }
+                } else {
+                    resultMessage.textContent = '😔 ИИ выиграл игру!';
+                    resultMessage.className = 'result-message lose-message';
+                    this.addLogEntry('ИИ выиграл игру!', 'lose');
+                    // Обновляем задания
+                    if (window.dailyQuestsManager) {
+                        dailyQuestsManager.updateQuestProgress('battle_1');
+                        dailyQuestsManager.updateQuestProgress('battle_3');
+                    }
+                }
+                document.querySelectorAll('.battle-card').forEach(el => {
+                    el.classList.add('disabled');
+                });
+            }
+            startBattle() {
+                if (this.playerDeck.length === 0) {
+                    alert('❌ Ваша боевая колода пуста! Добавьте карты из коллекции.');
+                    return;
+                }
+                // Сбрасываем состояние игры
+                this.playerScore = 0;
+                this.aiScore = 0;
+                this.round = 0;
+                this.isBattleActive = true;
+                this.gameEnded = false;
+                this.currentPlayerCard = null;
+                this.currentAICard = null;
+                this.lastPlayerCardType = null;
+                document.getElementById('player-score').textContent = this.playerScore;
+                document.getElementById('ai-score').textContent = this.aiScore;
+                const playerSlot = document.getElementById('player-card-slot');
+                const aiSlot = document.getElementById('ai-card-slot');
+                const resultMessage = document.getElementById('result-message');
+                if (playerSlot) playerSlot.innerHTML = '<div class="card-placeholder">Выберите карту из колоды</div>';
+                if (aiSlot) aiSlot.innerHTML = '<div class="card-placeholder">ИИ выбирает...</div>';
+                if (resultMessage) {
+                    resultMessage.textContent = '';
+                    resultMessage.className = 'result-message';
+                }
+                document.querySelectorAll('.battle-card').forEach(el => {
+                    el.classList.remove('disabled');
+                });
+                const logContainer = document.getElementById('battle-log');
+                if (logContainer) logContainer.innerHTML = '<div class="log-entry">Бой начат! Выберите карту.</div>';
+            }
+            restartBattle() {
+                this.startBattle();
+            }
+            addLogEntry(message, type = '') {
+                const logContainer = document.getElementById('battle-log');
+                if (!logContainer) return;
+                const logEntry = document.createElement('div');
+                logEntry.className = `log-entry ${type}`;
+                logEntry.textContent = message;
+                logContainer.appendChild(logEntry);
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+            setupEventListeners() {
+                document.getElementById('start-battle').addEventListener('click', () => {
+                    this.startBattle();
+                });
+                document.getElementById('restart-battle').addEventListener('click', () => {
+                    this.restartBattle();
+                });
+            }
+        }
+        // ==================== СИСТЕМА ПРОФИЛЯ ====================
+        class ProfileManager {
+            constructor() {
+                this.init();
+            }
+            init() {
+                this.updateProfile();
+            }
+            updateProfile() {
+                const userLevel = DataManager.getUserLevel();
+                const userBalance = DataManager.getUserBalance();
+                const collection = DataManager.getCollection();
+                // Статистика загружается из localStorage
+                const stats = JSON.parse(localStorage.getItem('playerStats') || '{"totalWins": 0, "totalLosses": 0, "totalBattles": 0}');
+                
+                document.getElementById('profile-name').textContent = 'Игрок';
+                document.getElementById('profile-level').textContent = userLevel;
+                document.getElementById('profile-balance').textContent = userBalance;
+                document.getElementById('profile-total-wins').textContent = stats.totalWins;
+                document.getElementById('profile-total-losses').textContent = stats.totalLosses;
+                document.getElementById('profile-total-battles').textContent = stats.totalBattles;
+                document.getElementById('profile-collection-count').textContent = collection.length;
+            }
+        }
+        // ==================== ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            const warehouse = new CardWarehouse();
+            const collectionManager = new CollectionManager();
+            const dailyQuestsManager = new DailyQuestsManager();
+            const battleManager = new BattleManager();
+            const profileManager = new ProfileManager();
+
+            window.warehouse = warehouse;
+            window.collectionManager = collectionManager;
+            window.dailyQuestsManager = dailyQuestsManager;
+            window.battleManager = battleManager;
+            window.profileManager = profileManager;
+
+            // Кнопка выхода
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                if (confirm('Вы уверены, что хотите выйти?')) {
+                    DataManager.logout();
                 }
             });
-            // Инициализация данных
-            DataManager.initialize();
-            // Остальная логика игры (навигация, фильтры и т.д.) должна быть адаптирована для работы с сервером
-            // Пока что оставим базовую навигацию
+
+            // Навигация
             const navTabs = document.querySelectorAll('.nav-tab');
             const sections = document.querySelectorAll('.section');
+
             navTabs.forEach(tab => {
                 tab.addEventListener('click', () => {
                     const targetSection = tab.getAttribute('data-section');
@@ -1153,6 +1949,15 @@
                             section.classList.add('active');
                         }
                     });
+                    if (targetSection === 'collection') {
+                        collectionManager.renderCollection();
+                    } else if (targetSection === 'battle') {
+                        battleManager.updateBattleDeck();
+                    } else if (targetSection === 'daily-quests') {
+                        dailyQuestsManager.renderQuests();
+                    } else if (targetSection === 'profile') {
+                        profileManager.updateProfile();
+                    }
                 });
             });
         });
