@@ -1034,18 +1034,26 @@
             static handleRegister() {
                 const email = document.getElementById('auth-email').value;
                 const password = document.getElementById('auth-password').value;
+                // --- ИСПРАВЛЕНО: Получаем значение подтверждения пароля ---
                 const confirmPassword = document.getElementById('auth-confirm-password').value;
+                // --- /ИСПРАВЛЕНО ---
+
+                // --- ИСПРАВЛЕНО: Проверяем совпадение паролей КЛИЕНТСКИ ---
                 if (password !== confirmPassword) {
                     document.getElementById('auth-error').textContent = 'Пароли не совпадают';
-                    return;
+                    return; // Прерываем выполнение, если совпадают
                 }
-                // Заглушка для API-вызова
+                // --- /ИСПРАВЛЕНО ---
+
+                // Заглушка для API-вызова - теперь отправляем confirmPassword
                 fetch('https://rps-arena-server.onrender.com/api/auth/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ email, password })
+                    // --- ИСПРАВЛЕНО: Передаем confirmPassword ---
+                    body: JSON.stringify({ email, password, confirmPassword })
+                    // --- /ИСПРАВЛЕНО ---
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -1053,8 +1061,9 @@
                         localStorage.setItem('authToken', data.token);
                         document.getElementById('auth-error').textContent = '';
                         document.getElementById('auth-overlay').style.display = 'none';
-                        this.loadUserData();
+                        this.loadUserData(); // Загружаем данные пользователя после успешной регистрации
                     } else {
+                        // Сервер может вернуть ошибку, например, если email занят
                         document.getElementById('auth-error').textContent = data.error || 'Ошибка регистрации';
                     }
                 })
