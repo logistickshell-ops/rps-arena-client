@@ -93,6 +93,25 @@
         .section.active {
             display: block;
         }
+        /* Стили для главной страницы */
+        .home-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        .home-title {
+            text-align: center;
+            font-size: 2em;
+            color: #00d4ff;
+            margin-bottom: 20px;
+        }
+        .home-content {
+            text-align: center;
+            font-size: 1.2em;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
         /* Стили для склада */
         .filters-section {
             background: rgba(255, 255, 255, 0.05);
@@ -671,50 +690,7 @@
             background: rgba(0, 255, 136, 0.2);
             border-color: #00ff88;
         }
-        /* Стили для лидерборда */
-        .leaderboard-container {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-        }
-        .leaderboard-title {
-            text-align: center;
-            font-size: 2em;
-            color: #00d4ff;
-            margin-bottom: 30px;
-            text-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
-        }
-        .leaderboard-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        .leaderboard-stat-card {
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            border: 2px solid rgba(0, 212, 255, 0.3);
-            transition: all 0.3s ease;
-        }
-        .leaderboard-stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 212, 255, 0.3);
-            border-color: #00d4ff;
-        }
-        .leaderboard-stat-number {
-            font-size: 3em;
-            font-weight: bold;
-            color: #00ff88;
-            margin-bottom: 10px;
-            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
-        }
-        .leaderboard-stat-label {
-            font-size: 1.2em;
-            color: #00d4ff;
-        }
+        /* Стили для достижений */
         .achievements-section {
             margin-top: 30px;
         }
@@ -779,107 +755,21 @@
                 grid-template-columns: 1fr;
             }
         }
-
-        /* Стили для модального окна аутентификации */
-        .auth-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .auth-content {
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            padding: 30px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 500px;
-            border: 2px solid #00d4ff;
-        }
-        .auth-form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .auth-input {
-            padding: 12px;
-            border-radius: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.3);
-            color: white;
-            font-size: 1em;
-        }
-        .auth-btn {
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #00ff88, #00d4ff);
-            color: #1a1a2e;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-        .auth-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
-        }
-        .auth-toggle {
-            margin-top: 10px;
-            text-align: center;
-            color: #00d4ff;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-        .auth-error {
-            color: #ff4444;
-            text-align: center;
-            margin-top: 10px;
-        }
-        .auth-success {
-            color: #00ff88;
-            text-align: center;
-            margin-top: 10px;
-        }
     </style>
 </head>
 <body>
-    <!-- Модальное окно аутентификации -->
-    <div id="auth-modal" class="auth-modal" style="display: flex;">
-        <div class="auth-content">
-            <h2 id="auth-title">Вход</h2>
-            <form id="auth-form" class="auth-form">
-                <input type="email" id="auth-email" class="auth-input" placeholder="Email" required>
-                <input type="password" id="auth-password" class="auth-input" placeholder="Пароль" required>
-                <input type="password" id="auth-confirm-password" class="auth-input" placeholder="Подтвердите пароль" style="display: none;" required>
-                <input type="text" id="auth-player-name" class="auth-input" placeholder="Имя игрока" style="display: none;" required>
-                <button type="submit" class="auth-btn" id="auth-submit-btn">Войти</button>
-            </form>
-            <div id="auth-message" class="auth-error"></div>
-            <div id="auth-success-message" class="auth-success"></div>
-            <div class="auth-toggle" id="auth-toggle">Ещё не зарегистрированы? Зарегистрироваться</div>
-        </div>
-    </div>
-
-    <!-- Основной контейнер игры (скрыт до аутентификации) -->
-    <div class="container" id="main-container">
+    <div class="container">
         <div class="header">
-            <h1>🎮 RPS Arena - Упрощённая версия</h1>
+            <h1>🎴 Crypto Arena - Упрощённая версия</h1>
             <p>Собирайте карты, формируйте колоду и сражайтесь с ИИ!</p>
             <div class="user-info">
                 <div class="currency">
                     <span class="currency-icon">💰</span>
-                    <span id="user-balance">-</span> TCR
+                    <span id="user-balance">1000</span> TCR
                 </div>
                 <div class="user-level">
-                    Уровень: <span id="user-level">-</span>
+                    Уровень: <span id="user-level">1</span>
                 </div>
-                <button id="logout-btn" class="auth-btn" style="margin-left: 20px; padding: 5px 10px; font-size: 0.9em;">Выйти</button>
             </div>
         </div>
         <div class="nav-tabs">
@@ -890,11 +780,10 @@
             <div class="nav-tab" data-section="daily-quests">📅 Ежедневные задания</div>
             <div class="nav-tab" data-section="profile">👤 Профиль</div>
         </div>
-
         <!-- Раздел главной страницы -->
         <div id="home-section" class="section active">
             <div class="home-container">
-                <h2 class="home-title">Добро пожаловать в RPS Arena!</h2>
+                <h2 class="home-title">Добро пожаловать в Crypto Arena!</h2>
                 <div class="home-content">
                     <p>Это стратегическая карточная игра, где вы соревнуетесь с искусственным интеллектом.</p>
                     <p>Собирайте уникальные карты, формируйте боевые колоды и сражайтесь за награды!</p>
@@ -902,7 +791,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Раздел склада -->
         <div id="warehouse-section" class="section">
             <div class="filters-section">
@@ -960,7 +848,6 @@
                 <!-- Карточки склада будут здесь -->
             </div>
         </div>
-
         <!-- Раздел коллекции -->
         <div id="collection-section" class="section">
             <div class="collection-stats">
@@ -977,7 +864,6 @@
                 <!-- Карточки коллекции будут здесь -->
             </div>
         </div>
-
         <!-- Раздел боя -->
         <div id="battle-section" class="section">
             <div class="score-board">
@@ -1017,7 +903,6 @@
                 <div class="log-entry">Выберите "Начать бой" чтобы начать сражение!</div>
             </div>
         </div>
-
         <!-- Раздел ежедневных заданий -->
         <div id="daily-quests-section" class="section">
             <div class="daily-quests-container">
@@ -1028,7 +913,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Раздел профиля -->
         <div id="profile-section" class="section">
             <div class="profile-container">
@@ -1080,7 +964,6 @@
             </div>
         </div>
     </div>
-
     <script>
         // ========== НАЧАЛО ВСЕГО JAVASCRIPT КОДА ==========
         // --- КОНФИГУРАЦИЯ ---
@@ -1104,34 +987,30 @@
                 localStorage.removeItem('authToken');
             }
 
-static async register(email, password, playerName) {
-    // Получаем значение из поля подтверждения пароля
-    const confirmPassword = document.getElementById('auth-confirm-password').value;
+            static async register(email, password) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email, password }),
+                    });
 
-    try {
-        const response = await fetch(`${API_BASE_URL}/auth/register`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            // Теперь отправляем все четыре поля:
-            body: JSON.stringify({ email, password, playerName, confirmPassword }), // <-- Добавлен confirmPassword
-        });
+                    const data = await response.json();
+                    if (response.ok) {
+                        this.setAuthToken(data.token);
+                        DataManager.updateUserDataLocally(data.user); // Обновляем локальные данные
+                        return { success: true, message: data.message };
+                    } else {
+                        return { success: false, message: data.error || 'Ошибка регистрации' };
+                    }
+                } catch (error) {
+                    console.error('Ошибка регистрации:', error);
+                    return { success: false, message: 'Ошибка подключения к серверу' };
+                }
+            }
 
-        const data = await response.json();
-        if (response.ok) {
-            this.setAuthToken(data.token);
-            DataManager.updateUserDataLocally(data.user);
-            return { success: true, message: data.message };
-        } else {
-            return { success: false, message: data.error || 'Ошибка регистрации' };
-        }
-    } catch (error) {
-        console.error('Ошибка регистрации:', error);
-        return { success: false, message: 'Ошибка подключения к серверу' };
-    }
-}
-            
             static async login(email, password) {
                 try {
                     const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -1145,7 +1024,7 @@ static async register(email, password, playerName) {
                     const data = await response.json();
                     if (response.ok) {
                         this.setAuthToken(data.token);
-                        DataManager.updateUserDataLocally(data.user);
+                        DataManager.updateUserDataLocally(data.user); // Обновляем локальные данные
                         return { success: true, message: data.message };
                     } else {
                         return { success: false, message: data.error || 'Ошибка входа' };
@@ -1181,7 +1060,44 @@ static async register(email, password, playerName) {
         // ========== СИСТЕМА ХРАНЕНИЯ ДАННЫХ ==========
         class DataManager {
             static initialize() {
-                // Инициализация не требуется, так как данные приходят с сервера после аутентификации
+                if (!localStorage.getItem('nftCollection')) {
+                    localStorage.setItem('nftCollection', JSON.stringify([]));
+                }
+                if (!localStorage.getItem('battleDeck')) {
+                    localStorage.setItem('battleDeck', JSON.stringify([]));
+                }
+                if (!localStorage.getItem('userBalance')) {
+                    localStorage.setItem('userBalance', '1000');
+                }
+                if (!localStorage.getItem('userLevel')) {
+                    localStorage.setItem('userLevel', '1');
+                }
+                if (!localStorage.getItem('playerStats')) {
+                    localStorage.setItem('playerStats', JSON.stringify({
+                        totalWins: 0,
+                        totalLosses: 0,
+                        currentStreak: 0,
+                        bestStreak: 0,
+                        totalBattles: 0
+                    }));
+                }
+                if (!localStorage.getItem('achievements')) {
+                    localStorage.setItem('achievements', JSON.stringify({
+                        firstWin: false,
+                        firstLoss: false,
+                        win5: false,
+                        loss5: false
+                    }));
+                }
+                if (!localStorage.getItem('dailyQuests')) {
+                    localStorage.setItem('dailyQuests', JSON.stringify({
+                        quests: [],
+                        lastClaimedDate: null
+                    }));
+                }
+                if (!localStorage.getItem('aiDeck')) {
+                    localStorage.setItem('aiDeck', JSON.stringify([]));
+                }
             }
 
             static updateUserDataLocally(userData) {
@@ -1198,8 +1114,6 @@ static async register(email, password, playerName) {
                 }));
                 localStorage.setItem('achievements', JSON.stringify(userData.achievements || {}));
                 localStorage.setItem('dailyQuests', JSON.stringify(userData.quests || []));
-                // Обновляем имя игрока
-                localStorage.setItem('playerName', userData.playerName || 'Игрок');
             }
 
             static clearLocalData() {
@@ -1210,7 +1124,7 @@ static async register(email, password, playerName) {
                 localStorage.removeItem('playerStats');
                 localStorage.removeItem('achievements');
                 localStorage.removeItem('dailyQuests');
-                localStorage.removeItem('playerName'); // Очищаем имя игрока
+                localStorage.removeItem('aiDeck');
             }
 
             static async loadUserDataFromServer() {
@@ -1231,12 +1145,10 @@ static async register(email, password, playerName) {
                         // Обновляем интерфейс
                         document.getElementById('user-balance').textContent = userData.balance;
                         document.getElementById('user-level').textContent = userData.level;
-                        document.getElementById('profile-name').textContent = userData.playerName || 'Игрок';
                         // Перезагружаем компоненты, которые зависят от данных
                         if (typeof warehouse !== 'undefined') warehouse.renderCards();
                         if (typeof collectionManager !== 'undefined') collectionManager.renderCollection();
                         if (typeof profileManager !== 'undefined') profileManager.updateProfile();
-                        if (typeof leaderboardManager !== 'undefined') leaderboardManager.renderLeaderboard();
                         if (typeof dailyQuestsManager !== 'undefined') dailyQuestsManager.renderQuests();
                     } else {
                         console.error('Ошибка загрузки профиля:', response.status);
@@ -1357,16 +1269,34 @@ static async register(email, password, playerName) {
                  // !!! ТУТ НУЖНО ВЫЗВАТЬ API для синхронизации с сервером !!!
                  // this.updateDailyQuestsOnServer(questsData);
             }
-            // Метод для получения имени игрока
-            static getPlayerName() {
-                return localStorage.getItem('playerName') || 'Игрок';
+            static getAIDeck() {
+                const aiDeck = JSON.parse(localStorage.getItem('aiDeck') || '[]');
+                return aiDeck.map(cardData => {
+                    return new NFTCard(
+                        cardData.id,
+                        cardData.name,
+                        cardData.type,
+                        cardData.element,
+                        cardData.level,
+                        cardData.price
+                    );
+                });
             }
-            // Метод для обновления имени игрока
-            static updatePlayerName(newName) {
-                localStorage.setItem('playerName', newName);
-                document.getElementById('profile-name').textContent = newName;
-                 // !!! ТУТ НУЖНО ВЫЗВАТЬ API для синхронизации с сервером !!!
-                 // this.updatePlayerNameOnServer(newName);
+            static setAIDeck(deck) {
+                const deckData = deck.map(card => card.toJSON());
+                localStorage.setItem('aiDeck', JSON.stringify(deckData));
+            }
+            static resetAllData() {
+                localStorage.removeItem('nftCollection');
+                localStorage.removeItem('battleDeck');
+                localStorage.removeItem('userBalance');
+                localStorage.removeItem('userLevel');
+                localStorage.removeItem('playerStats');
+                localStorage.removeItem('achievements');
+                localStorage.removeItem('dailyQuests');
+                localStorage.removeItem('aiDeck');
+                this.initialize();
+                window.location.reload();
             }
         }
 
@@ -1403,6 +1333,16 @@ static async register(email, password, playerName) {
             isInBattleDeck() {
                 const battleDeck = DataManager.getBattleDeck();
                 return battleDeck.some(c => c.id === this.id);
+            }
+            toJSON() {
+                return {
+                    id: this.id,
+                    name: this.name,
+                    type: this.type,
+                    element: this.element,
+                    level: this.level,
+                    price: this.price
+                };
             }
         }
 
@@ -1476,7 +1416,7 @@ static async register(email, password, playerName) {
             }
         }
 
-        // ==================== СИСТЕМА ЕЖЕДНЕВНЫХ ЗАДАНИЙ ====================
+        // ========== СИСТЕМА ЕЖЕДНЕВНЫХ ЗАДАНИЙ ==========
         class DailyQuestsManager {
             constructor() {
                 this.quests = [];
@@ -1549,17 +1489,20 @@ static async register(email, password, playerName) {
             claimReward(questId) {
                 const quest = this.quests.find(q => q.id === questId);
                 if (quest && quest.completed) {
-                    let rewardMessage = `Получены награды за задание "${quest.title}":\n`;
+                    let rewardMessage = `Получены награды за задание "${quest.title}":
+`;
                     quest.rewards.forEach(reward => {
                         if (reward.type === 'currency') {
                             DataManager.updateUserBalance(DataManager.getUserBalance() + reward.amount);
-                            rewardMessage += `💰 ${reward.amount} TCR\n`;
+                            rewardMessage += `💰 ${reward.amount} TCR
+`;
                         } else if (reward.type === 'card') {
                             const newCard = CardGenerator.generateCard(Date.now());
                             // Сделаем карту с заданной редкостью
                             newCard.rarity = reward.rarity;
                             DataManager.addToCollection(newCard);
-                            rewardMessage += `🃏 ${newCard.name} (${newCard.rarity} карта)\n`;
+                            rewardMessage += `🃏 ${newCard.name} (${newCard.rarity} карта)
+`;
                         }
                     });
                     // Сбросим задание для следующего дня
@@ -1583,8 +1526,10 @@ static async register(email, password, playerName) {
                         <p class="quest-description">${quest.description}</p>
                         <div class="quest-rewards">
                             <strong>Награды:</strong>
-                            ${quest.rewards.map(reward => 
-                                `<div class="reward-item">${reward.type === 'currency' ? `💰 ${reward.amount} TCR` : `🃏 ${reward.rarity} карта`}</div>`
+                            ${quest.rewards.map(reward =>
+                                `<div class="reward-item">
+                                    ${reward.type === 'currency' ? `💰 ${reward.amount} TCR` : `🃏 ${reward.rarity} карта`}
+                                </div>`
                             ).join('')}
                         </div>
                         <div class="quest-progress">
@@ -1663,7 +1608,7 @@ static async register(email, password, playerName) {
                             💰 ${card.price} TCR
                         </div>
                         <div class="card-actions">
-                            ${inCollection ? 
+                            ${inCollection ?
                                 '<button class="card-btn" onclick="warehouse.removeFromCollection(' + card.id + ')">🗑️ Удалить</button>' :
                                 '<button class="card-btn primary" onclick="warehouse.buyCard(' + card.id + ')">🛒 Купить</button>'
                             }
@@ -1775,7 +1720,7 @@ static async register(email, password, playerName) {
                     </div>
                     <div class="card-footer">
                         <div class="card-actions">
-                            ${inBattleDeck ? 
+                            ${inBattleDeck ?
                                 '<button class="card-btn" onclick="collectionManager.removeFromBattleDeck(' + card.id + ')">➖ Из колоды</button>' :
                                 '<button class="card-btn primary" onclick="collectionManager.addToBattleDeck(' + card.id + ')">➕ В колоду</button>'
                             }
@@ -1933,7 +1878,7 @@ static async register(email, password, playerName) {
             resolveRound() {
                 if (!this.currentPlayerCard || !this.currentAICard) return;
                 let rpsResult = this.determineRPSWinner(
-                    this.currentPlayerCard.type, 
+                    this.currentPlayerCard.type,
                     this.currentAICard.type
                 );
                 let roundWinner;
@@ -2028,7 +1973,7 @@ static async register(email, password, playerName) {
                     dailyQuestsManager.updateQuestProgress('battle_1');
                     dailyQuestsManager.updateQuestProgress('battle_3');
                     leaderboardManager.updateStats(false);
-                     // !!! ТУТ НУЖНО ВЫЗВАТЬ API для синхронизации результата боя с сервером !!!
+                    // !!! ТУТ НУЖНО ВЫЗВАТЬ API для синхронизации результата боя с сервером !!!
                 }
                 document.querySelectorAll('.battle-card').forEach(el => {
                     el.classList.add('disabled');
@@ -2097,50 +2042,24 @@ static async register(email, password, playerName) {
                 const userBalance = DataManager.getUserBalance();
                 const collection = DataManager.getCollection();
                 const stats = DataManager.getPlayerStats();
-                const winRate = stats.totalBattles > 0 ? Math.round((stats.totalWins / stats.totalBattles) * 100) : 0;
+                const achievements = DataManager.getAchievements();
                 
-                document.getElementById('profile-name').textContent = DataManager.getPlayerName(); // Используем имя из DataManager
+                document.getElementById('profile-name').textContent = 'Игрок';
                 document.getElementById('profile-level').textContent = userLevel;
                 document.getElementById('profile-balance').textContent = userBalance;
                 document.getElementById('profile-total-wins').textContent = stats.totalWins;
                 document.getElementById('profile-total-losses').textContent = stats.totalLosses;
-                document.getElementById('profile-win-rate').textContent = winRate + '%';
                 document.getElementById('profile-total-battles').textContent = stats.totalBattles;
                 document.getElementById('profile-current-streak').textContent = stats.currentStreak;
                 document.getElementById('profile-best-streak').textContent = stats.bestStreak;
                 document.getElementById('profile-collection-count').textContent = collection.length;
-            }
-            setupEventListeners() {
-                document.getElementById('full-reset-btn').addEventListener('click', () => {
-                    if (confirm('Вы уверены, что хотите сбросить весь прогресс? Это действие нельзя отменить.')) {
-                        DataManager.resetAllData();
-                    }
-                });
-            }
-        }
-
-        // ==================== СИСТЕМА ЛИДЕРБОРДА ====================
-        class LeaderboardManager {
-            constructor() {
-                this.init();
-            }
-            init() {
-                this.renderLeaderboard();
-                this.renderAchievements();
-            }
-            renderLeaderboard() {
-                const stats = DataManager.getPlayerStats();
-                const winRate = stats.totalBattles > 0 ? Math.round((stats.totalWins / stats.totalBattles) * 100) : 0;
                 
-                document.getElementById('total-wins').textContent = stats.totalWins;
-                document.getElementById('total-losses').textContent = stats.totalLosses;
-                document.getElementById('win-rate').textContent = winRate + '%';
-                document.getElementById('total-battles').textContent = stats.totalBattles;
-                document.getElementById('current-streak').textContent = stats.currentStreak;
-                document.getElementById('best-streak').textContent = stats.bestStreak;
+                const winRate = stats.totalBattles > 0 ? Math.round((stats.totalWins / stats.totalBattles) * 100) : 0;
+                document.getElementById('profile-win-rate').textContent = winRate + '%';
+                
+                this.renderAchievements(achievements);
             }
-            renderAchievements() {
-                const achievements = DataManager.getAchievements();
+            renderAchievements(achievements) {
                 const container = document.getElementById('achievements-grid');
                 const achievementList = [
                     { id: 'firstWin', icon: '🏆', name: 'Первая победа', description: 'Одержите первую победу' },
@@ -2160,6 +2079,23 @@ static async register(email, password, playerName) {
                     container.appendChild(achievementCard);
                 });
             }
+            setupEventListeners() {
+                document.getElementById('full-reset-btn').addEventListener('click', () => {
+                    if (confirm('Вы уверены, что хотите сбросить весь прогресс? Это действие нельзя отменить.')) {
+                        DataManager.resetAllData();
+                    }
+                });
+            }
+        }
+
+        // ==================== СИСТЕМА ЛИДЕРБОРДА ====================
+        class LeaderboardManager {
+            constructor() {
+                this.init();
+            }
+            init() {
+                // Ничего не делаем, так как вся статистика теперь в профиле
+            }
             updateStats(won) {
                 const stats = DataManager.getPlayerStats();
                 stats.totalBattles++;
@@ -2174,7 +2110,7 @@ static async register(email, password, playerName) {
                     stats.currentStreak = 0;
                 }
                 DataManager.updatePlayerStats(stats);
-                this.renderLeaderboard();
+                profileManager.updateProfile(); // Обновляем профиль
                 this.checkAchievements();
             }
             checkAchievements() {
@@ -2206,7 +2142,7 @@ static async register(email, password, playerName) {
                 }
                 if (updated) {
                     DataManager.updateAchievements(achievements);
-                    this.renderAchievements();
+                    profileManager.updateProfile(); // Обновляем профиль
                 }
             }
             showAchievementNotification(name, icon) {
@@ -2218,167 +2154,49 @@ static async register(email, password, playerName) {
 
         // ==================== ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ ====================
         document.addEventListener('DOMContentLoaded', () => {
-            const authModal = document.getElementById('auth-modal');
-            const mainContainer = document.getElementById('main-container');
-            const authForm = document.getElementById('auth-form');
-            const authTitle = document.getElementById('auth-title');
-            const authSubmitBtn = document.getElementById('auth-submit-btn');
-            const authToggle = document.getElementById('auth-toggle');
-            const authEmailInput = document.getElementById('auth-email');
-            const authPasswordInput = document.getElementById('auth-password');
-            const authConfirmPasswordInput = document.getElementById('auth-confirm-password');
-            const authPlayerNameInput = document.getElementById('auth-player-name');
-            const authMessage = document.getElementById('auth-message');
-            const authSuccessMessage = document.getElementById('auth-success-message');
-            const logoutBtn = document.getElementById('logout-btn');
+            const warehouse = new CardWarehouse();
+            const collectionManager = new CollectionManager();
+            const battleManager = new BattleManager();
+            const dailyQuestsManager = new DailyQuestsManager();
+            const profileManager = new ProfileManager();
+            const leaderboardManager = new LeaderboardManager();
 
-            let isLoginMode = true;
+            window.warehouse = warehouse;
+            window.collectionManager = collectionManager;
+            window.battleManager = battleManager;
+            window.dailyQuestsManager = dailyQuestsManager;
+            window.profileManager = profileManager;
+            window.leaderboardManager = leaderboardManager;
 
-            // Проверяем, авторизован ли пользователь
-            if (AuthManager.isLoggedIn()) {
-                authModal.style.display = 'none';
-                mainContainer.style.display = 'block';
-                DataManager.loadUserDataFromServer(); // Загружаем данные с сервера
-                // Инициализируем менеджеры
-                window.warehouse = new CardWarehouse();
-                window.collectionManager = new CollectionManager();
-                window.battleManager = new BattleManager();
-                window.dailyQuestsManager = new DailyQuestsManager();
-                window.profileManager = new ProfileManager();
-                window.leaderboardManager = new LeaderboardManager();
+            const navTabs = document.querySelectorAll('.nav-tab');
+            const sections = document.querySelectorAll('.section');
 
-                // Настройка навигации
-                const navTabs = document.querySelectorAll('.nav-tab');
-                const sections = document.querySelectorAll('.section');
-
-                navTabs.forEach(tab => {
-                    tab.addEventListener('click', () => {
-                        const targetSection = tab.getAttribute('data-section');
-                        navTabs.forEach(t => t.classList.remove('active'));
-                        tab.classList.add('active');
-                        sections.forEach(section => {
-                            section.classList.remove('active');
-                            if (section.id === `${targetSection}-section`) {
-                                section.classList.add('active');
-                                // Обновление данных при переходе
-                                if (targetSection === 'collection') window.collectionManager.renderCollection();
-                                else if (targetSection === 'battle') window.battleManager.updateBattleDeck();
-                                else if (targetSection === 'daily-quests') window.dailyQuestsManager.renderQuests();
-                                else if (targetSection === 'profile') window.profileManager.updateProfile();
-                                else if (targetSection === 'leaderboard') {
-                                    window.leaderboardManager.renderLeaderboard();
-                                    window.leaderboardManager.renderAchievements();
-                                }
-                            }
-                        });
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const targetSection = tab.getAttribute('data-section');
+                    navTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                        if (section.id === `${targetSection}-section`) {
+                            section.classList.add('active');
+                        }
                     });
+                    if (targetSection === 'collection') {
+                        collectionManager.renderCollection();
+                    } else if (targetSection === 'battle') {
+                        battleManager.updateBattleDeck();
+                    } else if (targetSection === 'daily-quests') {
+                        dailyQuestsManager.renderQuests();
+                    } else if (targetSection === 'profile') {
+                        profileManager.updateProfile();
+                    }
                 });
-            } else {
-                authModal.style.display = 'flex';
-                mainContainer.style.display = 'none';
-            }
-
-            // Обработчик переключения между формами
-            authToggle.addEventListener('click', () => {
-                isLoginMode = !isLoginMode;
-                if (isLoginMode) {
-                    authTitle.textContent = 'Вход';
-                    authSubmitBtn.textContent = 'Войти';
-                    authConfirmPasswordInput.style.display = 'none';
-                    authPlayerNameInput.style.display = 'none';
-                } else {
-                    authTitle.textContent = 'Регистрация';
-                    authSubmitBtn.textContent = 'Зарегистрироваться';
-                    authConfirmPasswordInput.style.display = 'block';
-                    authPlayerNameInput.style.display = 'block';
-                }
-                authMessage.textContent = '';
-                authSuccessMessage.textContent = '';
             });
 
-            // Обработчик отправки формы
-            authForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                authMessage.textContent = '';
-                authSuccessMessage.textContent = '';
-
-                const email = authEmailInput.value.trim();
-                const password = authPasswordInput.value;
-                const confirmPassword = authConfirmPasswordInput.value;
-                const playerName = authPlayerNameInput.value.trim(); // Получаем имя игрока
-
-                if (!isLoginMode && password !== confirmPassword) {
-                    authMessage.textContent = 'Пароли не совпадают';
-                    return;
-                }
-
-                if (!isLoginMode && !playerName) {
-                    authMessage.textContent = 'Введите имя игрока';
-                    return;
-                }
-
-                let result;
-                if (isLoginMode) {
-                    result = await AuthManager.login(email, password);
-                } else {
-                    result = await AuthManager.register(email, password, playerName); // Передаём имя игрока
-                }
-
-                if (result.success) {
-                    authSuccessMessage.textContent = result.message;
-                    setTimeout(() => {
-                        authModal.style.display = 'none';
-                        mainContainer.style.display = 'block';
-                        DataManager.loadUserDataFromServer(); // Загружаем данные с сервера
-                        // Инициализируем менеджеры
-                        window.warehouse = new CardWarehouse();
-                        window.collectionManager = new CollectionManager();
-                        window.battleManager = new BattleManager();
-                        window.dailyQuestsManager = new DailyQuestsManager();
-                        window.profileManager = new ProfileManager();
-                        window.leaderboardManager = new LeaderboardManager();
-
-                        // Настройка навигации (повторно, на случай, если она не сработала из-за async)
-                        const navTabs = document.querySelectorAll('.nav-tab');
-                        const sections = document.querySelectorAll('.section');
-
-                        navTabs.forEach(tab => {
-                            tab.addEventListener('click', () => {
-                                const targetSection = tab.getAttribute('data-section');
-                                navTabs.forEach(t => t.classList.remove('active'));
-                                tab.classList.add('active');
-                                sections.forEach(section => {
-                                    section.classList.remove('active');
-                                    if (section.id === `${targetSection}-section`) {
-                                        section.classList.add('active');
-                                        if (targetSection === 'collection') window.collectionManager.renderCollection();
-                                        else if (targetSection === 'battle') window.battleManager.updateBattleDeck();
-                                        else if (targetSection === 'daily-quests') window.dailyQuestsManager.renderQuests();
-                                        else if (targetSection === 'profile') window.profileManager.updateProfile();
-                                        else if (targetSection === 'leaderboard') {
-                                            window.leaderboardManager.renderLeaderboard();
-                                            window.leaderboardManager.renderAchievements();
-                                        }
-                                    }
-                                });
-                            });
-                        });
-
-                        document.getElementById('user-balance').textContent = DataManager.getUserBalance();
-                        document.getElementById('user-level').textContent = DataManager.getUserLevel();
-                        document.getElementById('profile-name').textContent = DataManager.getPlayerName(); // Обновляем имя в профиле
-                    }, 1500);
-                } else {
-                    authMessage.textContent = result.message;
-                }
-            });
-
-            // Обработчик кнопки "Выйти"
-            logoutBtn.addEventListener('click', () => {
-                AuthManager.logout();
-            });
+            document.getElementById('user-balance').textContent = DataManager.getUserBalance();
+            document.getElementById('user-level').textContent = DataManager.getUserLevel();
         });
-        // ========== КОНЕЦ ВСЕГО JAVASCRIPT КОДА ==========
     </script>
 </body>
 </html>
