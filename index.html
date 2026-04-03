@@ -20,7 +20,6 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
-            display: none; /* Скрыто до аутентификации */
         }
         .header {
             text-align: center;
@@ -756,6 +755,7 @@
                 grid-template-columns: 1fr;
             }
         }
+
         /* Стили для модального окна аутентификации */
         .auth-modal {
             position: fixed;
@@ -832,9 +832,8 @@
             <form id="auth-form" class="auth-form">
                 <input type="email" id="auth-email" class="auth-input" placeholder="Email" required>
                 <input type="password" id="auth-password" class="auth-input" placeholder="Пароль" required>
-                <!-- ВАЖНО: УБРАЛИ 'required' с этих полей -->
                 <input type="password" id="auth-confirm-password" class="auth-input" placeholder="Подтвердите пароль" style="display: none;">
-                <input type="text" id="auth-player-name" class="auth-input" placeholder="Имя игрока" style="display: none;">
+                <input type="text" id="auth-player-name" class="auth-input" placeholder="Имя игрока" style="display: none;" required>
                 <button type="submit" class="auth-btn" id="auth-submit-btn">Войти</button>
             </form>
             <div id="auth-message" class="auth-error"></div>
@@ -1059,7 +1058,6 @@
     </div>
 
     <script>
-        // ========== НАЧАЛО ВСЕГО JAVASCRIPT КОДА ==========
         // --- КОНФИГУРАЦИЯ ---
         const API_BASE_URL = 'https://rps-arena-server.onrender.com/api'; // Замените на URL вашего сервера
 
@@ -1082,7 +1080,7 @@
             }
 
             static async register(email, password, playerName) {
-                // Получаем значение из поля подтверждения пароля
+                // --- ИСПРАВЛЕНО: Получаем значение из поля подтверждения ---
                 const confirmPassword = document.getElementById('auth-confirm-password').value;
 
                 try {
@@ -1091,15 +1089,15 @@
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        // Отправляем все 4 поля:
-                        body: JSON.stringify({ email, password, playerName, confirmPassword }), // <-- Добавлен playerName и confirmPassword
+                        // --- ИСПРАВЛЕНО: Отправляем playerName и confirmPassword ---
+                        body: JSON.stringify({ email, password, playerName, confirmPassword }),
                     });
 
                     const data = await response.json();
                     if (response.ok) {
                         this.setAuthToken(data.token);
-                        DataManager.updateUserDataLocally(data.user); // Обновляем локальные данные
-                        return { success: true, message: data.message, user: data.user, token: data.token };
+                        DataManager.updateUserDataLocally(data.user);
+                        return { success: true, message: data.message };
                     } else {
                         return { success: false, message: data.error || 'Ошибка регистрации' };
                     }
@@ -1122,8 +1120,8 @@
                     const data = await response.json();
                     if (response.ok) {
                         this.setAuthToken(data.token);
-                        DataManager.updateUserDataLocally(data.user); // Обновляем локальные данные
-                        return { success: true, message: data.message, user: data.user, token: data.token };
+                        DataManager.updateUserDataLocally(data.user);
+                        return { success: true, message: data.message };
                     } else {
                         return { success: false, message: data.error || 'Ошибка входа' };
                     }
@@ -1150,7 +1148,7 @@
                     }
                 }
                 this.clearAuthToken();
-                DataManager.clearLocalData(); // Очищаем локальные данные
+                DataManager.clearLocalData();
                 window.location.reload(); // Перезагружаем страницу, чтобы показать форму входа
             }
         }
@@ -1158,7 +1156,7 @@
         // ========== СИСТЕМА ХРАНЕНИЯ ДАННЫХ (ИСПРАВЛЕНО) ==========
         class DataManager {
             static initialize() {
-                // Инициализация localStorage (если нужно)
+                // Инициализация localStorage
                 if (!localStorage.getItem('nftCollection')) localStorage.setItem('nftCollection', '[]');
                 if (!localStorage.getItem('battleDeck')) localStorage.setItem('battleDeck', '[]');
                 if (!localStorage.getItem('userBalance')) localStorage.setItem('userBalance', '0');
@@ -1166,10 +1164,12 @@
                 if (!localStorage.getItem('playerStats')) localStorage.setItem('playerStats', JSON.stringify({ totalWins: 0, totalLosses: 0, currentStreak: 0, bestStreak: 0, totalBattles: 0 }));
                 if (!localStorage.getItem('achievements')) localStorage.setItem('achievements', '{}');
                 if (!localStorage.getItem('dailyQuests')) localStorage.setItem('dailyQuests', JSON.stringify({ quests: [], lastClaimedDate: null }));
-                if (!localStorage.getItem('aiDeck')) localStorage.setItem('aiDeck', '[]'); // Добавлено для ИИ
-                if (!localStorage.getItem('playerName')) localStorage.setItem('playerName', 'Игрок'); // Добавлено для имени игрока
+                if (!localStorage.getItem('aiDeck')) localStorage.setItem('aiDeck', '[]');
+                // --- ИСПРАВЛЕНО: Инициализация playerName ---
+                if (!localStorage.getItem('playerName')) localStorage.setItem('playerName', 'Игрок');
             }
 
+            // --- ИСПРАВЛЕНО: Добавлен метод updateUserDataLocally ---
             static updateUserDataLocally(userDataFromServer) {
                 localStorage.setItem('userBalance', userDataFromServer.balance.toString());
                 localStorage.setItem('userLevel', userDataFromServer.level.toString());
@@ -1184,18 +1184,15 @@
                 }));
                 localStorage.setItem('achievements', JSON.stringify(userDataFromServer.achievements || {}));
                 localStorage.setItem('dailyQuests', JSON.stringify(userDataFromServer.quests || []));
-                // Обновляем имя игрока
+                // --- ИСПРАВЛЕНО: Обновляем имя игрока ---
                 localStorage.setItem('playerName', userDataFromServer.playerName || 'Игрок');
-
-                // Обновляем интерфейс ТОЛЬКО если элементы существуют
-                const balanceElement = document.getElementById('user-balance');
-                const levelElement = document.getElementById('user-level');
-                const profileNameElement = document.getElementById('profile-name');
-                if (balanceElement) balanceElement.textContent = userDataFromServer.balance;
-                if (levelElement) levelElement.textContent = userDataFromServer.level;
-                if (profileNameElement) profileNameElement.textContent = userDataFromServer.playerName || 'Игрок';
+                // Обновляем интерфейс
+                document.getElementById('user-balance').textContent = userDataFromServer.balance;
+                document.getElementById('user-level').textContent = userDataFromServer.level;
+                document.getElementById('profile-name').textContent = userDataFromServer.playerName || 'Игрок';
             }
 
+            // --- ИСПРАВЛЕНО: Добавлен метод clearLocalData ---
             static clearLocalData() {
                 localStorage.removeItem('nftCollection');
                 localStorage.removeItem('battleDeck');
@@ -1204,10 +1201,11 @@
                 localStorage.removeItem('playerStats');
                 localStorage.removeItem('achievements');
                 localStorage.removeItem('dailyQuests');
-                localStorage.removeItem('aiDeck'); // Очищаем колоду ИИ
-                localStorage.removeItem('playerName'); // Очищаем имя игрока
+                // --- ИСПРАВЛЕНО: Удаляем имя игрока ---
+                localStorage.removeItem('playerName');
             }
 
+            // --- ИСПРАВЛЕНО: Добавлен метод loadUserDataFromServer ---
             static async loadUserDataFromServer() {
                 const token = AuthManager.getAuthToken();
                 if (!token) return;
@@ -1231,37 +1229,32 @@
                         if (typeof dailyQuestsManager !== 'undefined') dailyQuestsManager.renderQuests();
                     } else {
                         console.error('Ошибка загрузки профиля при загрузке:', response.status);
-                        // Токен может быть недействителен, разлогиниваем
                         AuthManager.logout();
                     }
                 } catch (error) {
                     console.error('Ошибка загрузки профиля при загрузке:', error);
-                    // Опционально: разлогинить при сетевой ошибке
-                    // AuthManager.logout();
+                    // AuthManager.logout(); // Опционально
                 }
             }
 
             // --- Методы для работы с локальными данными ---
             static getCollection() {
+                // --- ИСПРАВЛЕНО: Добавлена проверка на null ---
                 const collection = JSON.parse(localStorage.getItem('nftCollection') || '[]');
-                return collection.map(cardData => {
-                    return new NFTCard(
-                        cardData.id,
-                        cardData.name,
-                        cardData.type,
-                        cardData.element,
-                        cardData.level,
-                        cardData.price
-                    );
-                });
+                return collection.map(cardData => new NFTCard(
+                    cardData.id,
+                    cardData.name,
+                    cardData.type,
+                    cardData.element,
+                    cardData.level,
+                    cardData.price
+                ));
             }
             static addToCollection(card) {
                 const collection = this.getCollection();
                 if (!collection.find(c => c.id === card.id)) {
                     collection.push(card);
                     localStorage.setItem('nftCollection', JSON.stringify(collection));
-                    // !!! ТУТ НУЖНО ВЫЗВАТЬ API для синхронизации с сервером !!!
-                    // this.updateCollectionOnServer(collection);
                     return true;
                 }
                 return false;
@@ -1271,20 +1264,18 @@
                 const newCollection = collection.filter(c => c.id !== cardId);
                 localStorage.setItem('nftCollection', JSON.stringify(newCollection));
                 this.removeFromBattleDeck(cardId);
-                // !!! ТУТ НУЖНО ВЫЗВАТЬ API для синхронизации с сервером !!!
             }
             static getBattleDeck() {
+                // --- ИСПРАВЛЕНО: Добавлена проверка на null ---
                 const battleDeck = JSON.parse(localStorage.getItem('battleDeck') || '[]');
-                return battleDeck.map(cardData => {
-                    return new NFTCard(
-                        cardData.id,
-                        cardData.name,
-                        cardData.type,
-                        cardData.element,
-                        cardData.level,
-                        cardData.price
-                    );
-                });
+                return battleDeck.map(cardData => new NFTCard(
+                    cardData.id,
+                    cardData.name,
+                    cardData.type,
+                    cardData.element,
+                    cardData.level,
+                    cardData.price
+                ));
             }
             static addToBattleDeck(card) {
                 const battleDeck = this.getBattleDeck();
@@ -1294,8 +1285,6 @@
                 if (!battleDeck.find(c => c.id === card.id)) {
                     battleDeck.push(card);
                     localStorage.setItem('battleDeck', JSON.stringify(battleDeck));
-                    // !!! ТУТ НУЖНО ВЫЗВАТЬ API для синхронизации с сервером !!!
-                    // this.updateBattleDeckOnServer(battleDeck);
                     return true;
                 }
                 return false;
@@ -1304,7 +1293,6 @@
                 const battleDeck = this.getBattleDeck();
                 const newDeck = battleDeck.filter(c => c.id !== cardId);
                 localStorage.setItem('battleDeck', JSON.stringify(newDeck));
-                // !!! ТУТ НУЖНО ВЫЗВАТЬ API для синхронизации с сервером !!!
             }
             static getUserBalance() {
                 return parseInt(localStorage.getItem('userBalance') || '0');
@@ -1314,8 +1302,6 @@
                 // Обновляем интерфейс ТОЛЬКО если элемент существует
                 const balanceElement = document.getElementById('user-balance');
                 if (balanceElement) balanceElement.textContent = newBalance;
-                // !!! ТУТ НУЖНО ВЫЗВАТЬ API для синхронизации с сервером !!!
-                // this.updateUserBalanceOnServer(newBalance);
             }
             static getUserLevel() {
                 return parseInt(localStorage.getItem('userLevel') || '1');
@@ -1325,65 +1311,35 @@
                 // Обновляем интерфейс ТОЛЬКО если элемент существует
                 const levelElement = document.getElementById('user-level');
                 if (levelElement) levelElement.textContent = newLevel;
-                 // !!! ТУТ НУЖНО ВЫЗВАТЬ API для синхронизации с сервером !!!
-                 // this.updateUserLevelOnServer(newLevel);
             }
             static getPlayerStats() {
                 return JSON.parse(localStorage.getItem('playerStats') || '{"totalWins": 0, "totalLosses": 0, "currentStreak": 0, "bestStreak": 0, "totalBattles": 0}');
             }
             static updatePlayerStats(stats) {
                 localStorage.setItem('playerStats', JSON.stringify(stats));
-                // !!! ТУТ НУЖНО ВЫЗВАТЬ API для синхронизации с сервером !!!
-                // this.updatePlayerStatsOnServer(stats);
             }
             static getAchievements() {
                 return JSON.parse(localStorage.getItem('achievements') || '{}');
             }
             static updateAchievements(achievements) {
                 localStorage.setItem('achievements', JSON.stringify(achievements));
-                 // !!! ТУТ НУЖНО ВЫЗВАТЬ API для синхронизации с сервером !!!
-                 // this.updateAchievementsOnServer(achievements);
             }
             static getDailyQuests() {
                 return JSON.parse(localStorage.getItem('dailyQuests') || '{"quests": [], "lastClaimedDate": null}');
             }
             static updateDailyQuests(questsData) {
                 localStorage.setItem('dailyQuests', JSON.stringify(questsData));
-                 // !!! ТУТ НУЖНО ВЫЗВАТЬ API для синхронизации с сервером !!!
-                 // this.updateDailyQuestsOnServer(questsData);
             }
-            // --- НОВЫЙ МЕТОД: Получение колоды ИИ ---
-            static getAIDeck() {
-                const aiDeck = JSON.parse(localStorage.getItem('aiDeck') || '[]');
-                return aiDeck.map(cardData => {
-                    return new NFTCard(
-                        cardData.id,
-                        cardData.name,
-                        cardData.type,
-                        cardData.element,
-                        cardData.level,
-                        cardData.price
-                    );
-                });
-            }
-            // --- НОВЫЙ МЕТОД: Установка колоды ИИ ---
-            static setAIDeck(deck) {
-                const deckData = deck.map(card => card.toJSON());
-                localStorage.setItem('aiDeck', JSON.stringify(deckData));
-                // !!! ТУТ НУЖНО ВЫЗВАТЬ API для синхронизации с сервером (опционально) !!!
-            }
-            // --- НОВЫЙ МЕТОД: Получение имени игрока ---
+            // --- ИСПРАВЛЕНО: Добавлен метод getPlayerName ---
             static getPlayerName() {
                 return localStorage.getItem('playerName') || 'Игрок';
             }
-            // --- НОВЫЙ МЕТОД: Обновление имени игрока ---
+            // --- ИСПРАВЛЕНО: Добавлен метод updatePlayerName ---
             static updatePlayerName(newName) {
                 localStorage.setItem('playerName', newName);
                 // Обновляем интерфейс ТОЛЬКО если элемент существует
                 const nameElement = document.getElementById('profile-name');
                 if (nameElement) nameElement.textContent = newName;
-                 // !!! ТУТ НУЖНО ВЫЗВАТЬ API для синхронизации с сервером !!!
-                 // this.updatePlayerNameOnServer(newName);
             }
         }
 
@@ -1414,22 +1370,24 @@
                 return names[this.element] || this.element;
             }
             isInCollection() {
-                const collection = DataManager.getCollection();
-                return collection.some(c => c.id === this.id);
+                // --- ИСПРАВЛЕНО: Добавлена проверка на null в DataManager.getCollection ---
+                try {
+                    const collection = DataManager.getCollection();
+                    return collection.some(c => c.id === this.id);
+                } catch(e) {
+                    console.warn("Ошибка проверки isInCollection:", e);
+                    return false;
+                }
             }
             isInBattleDeck() {
-                const battleDeck = DataManager.getBattleDeck();
-                return battleDeck.some(c => c.id === this.id);
-            }
-            toJSON() {
-                return {
-                    id: this.id,
-                    name: this.name,
-                    type: this.type,
-                    element: this.element,
-                    level: this.level,
-                    price: this.price
-                };
+                // --- ИСПРАВЛЕНО: Добавлена проверка на null в DataManager.getBattleDeck ---
+                try {
+                    const battleDeck = DataManager.getBattleDeck();
+                    return battleDeck.some(c => c.id === this.id);
+                } catch(e) {
+                    console.warn("Ошибка проверки isInBattleDeck:", e);
+                    return false;
+                }
             }
         }
 
@@ -1569,8 +1527,6 @@
                     }
                     DataManager.updateDailyQuests({ quests: this.quests, lastClaimedDate: new Date().toDateString() });
                     this.renderQuests();
-                    // !!! ТУТ НУЖНО ВЫЗВАТЬ API для синхронизации с сервером !!!
-                    // this.updateQuestProgressOnServer(questId, amount);
                 }
             }
             claimReward(questId) {
@@ -1598,8 +1554,6 @@
                     DataManager.updateDailyQuests({ quests: this.quests, lastClaimedDate: new Date().toDateString() });
                     alert(rewardMessage);
                     this.renderQuests();
-                    // !!! ТУТ НУЖНО ВЫЗВАТЬ API для синхронизации с сервером !!!
-                    // this.claimRewardOnServer(questId);
                 }
             }
             renderQuests() {
@@ -1643,7 +1597,7 @@
                 this.init();
             }
             init() {
-                DataManager.initialize();
+                DataManager.initialize(); // --- ИСПРАВЛЕНО: Вызов initialize ---
                 this.generateAllCards(); // Генерируем все возможные карты
                 this.renderCards();
                 this.setupEventListeners();
@@ -1898,7 +1852,7 @@
             }
             // ИНТЕЛЛЕКТУАЛЬНЫЙ АЛГОРИТМ ВЫБОРА КАРТЫ ИИ (БЕЗ ПОДСМОТРА)
             selectAICard() {
-                // Используем колоду ИИ из DataManager (теперь метод существует)
+                // Используем колоду ИИ из DataManager
                 this.aiDeck = DataManager.getAIDeck();
                 if (!this.aiDeck || this.aiDeck.length === 0) {
                     // Если у ИИ нет колоды, генерируем её
@@ -1938,7 +1892,7 @@
                     randomCard.level = Math.min(randomCard.level + Math.floor(Math.random() * 2), 3);
                     this.aiDeck.push(randomCard);
                 }
-                // Сохраняем колоду ИИ в DataManager (теперь метод существует)
+                // Сохраняем колоду ИИ в DataManager
                 DataManager.setAIDeck(this.aiDeck);
                 console.log("Generated random AI deck:", this.aiDeck);
             }
@@ -2051,7 +2005,6 @@
                     dailyQuestsManager.updateQuestProgress('battle_1');
                     dailyQuestsManager.updateQuestProgress('battle_3');
                     leaderboardManager.updateStats(true);
-                    // !!! ТУТ НУЖНО ВЫЗВАТЬ API для синхронизации результата боя с сервером !!!
                 } else {
                     resultMessage.textContent = '😔 ИИ выиграл игру!';
                     resultMessage.className = 'result-message lose-message';
@@ -2060,7 +2013,6 @@
                     dailyQuestsManager.updateQuestProgress('battle_1');
                     dailyQuestsManager.updateQuestProgress('battle_3');
                     leaderboardManager.updateStats(false);
-                     // !!! ТУТ НУЖНО ВЫЗВАТЬ API для синхронизации результата боя с сервером !!!
                 }
                 document.querySelectorAll('.battle-card').forEach(el => {
                     el.classList.add('disabled');
@@ -2218,6 +2170,8 @@
 
         // ==================== ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ ====================
         document.addEventListener('DOMContentLoaded', () => {
+            DataManager.initialize(); // --- ИСПРАВЛЕНО: Вызов initialize при загрузке ---
+
             const authModal = document.getElementById('auth-modal');
             const mainContainer = document.getElementById('main-container');
             const authForm = document.getElementById('auth-form');
@@ -2227,7 +2181,7 @@
             const authEmailInput = document.getElementById('auth-email');
             const authPasswordInput = document.getElementById('auth-password');
             const authConfirmPasswordInput = document.getElementById('auth-confirm-password');
-            const authPlayerNameInput = document.getElementById('auth-player-name');
+            const authPlayerNameInput = document.getElementById('auth-player-name'); // --- ИСПРАВЛЕНО: Добавлен элемент ---
             const authMessage = document.getElementById('auth-message');
             const authSuccessMessage = document.getElementById('auth-success-message');
             const logoutBtn = document.getElementById('logout-btn');
@@ -2238,7 +2192,7 @@
             if (AuthManager.isLoggedIn()) {
                 authModal.style.display = 'none';
                 mainContainer.style.display = 'block';
-                DataManager.loadUserDataFromServer(); // Загружаем данные с сервера
+                DataManager.loadUserDataFromServer(); // --- ИСПРАВЛЕНО: Загружаем данные с сервера ---
                 // Инициализируем менеджеры
                 window.warehouse = new CardWarehouse();
                 window.collectionManager = new CollectionManager();
@@ -2272,7 +2226,7 @@
 
                 document.getElementById('user-balance').textContent = DataManager.getUserBalance();
                 document.getElementById('user-level').textContent = DataManager.getUserLevel();
-                document.getElementById('profile-name').textContent = DataManager.getPlayerName();
+                document.getElementById('profile-name').textContent = DataManager.getPlayerName(); // --- ИСПРАВЛЕНО: Обновляем имя при загрузке ---
             } else {
                 authModal.style.display = 'flex';
                 mainContainer.style.display = 'none';
@@ -2285,7 +2239,7 @@
                     authTitle.textContent = 'Вход';
                     authSubmitBtn.textContent = 'Войти';
                     authConfirmPasswordInput.style.display = 'none';
-                    authPlayerNameInput.style.display = 'none';
+                    authPlayerNameInput.style.display = 'none'; // --- ИСПРАВЛЕНО: Скрываем имя при входе ---
                     // УБИРАЕМ 'required' с полей регистрации при переключении на вход
                     authConfirmPasswordInput.removeAttribute('required');
                     authPlayerNameInput.removeAttribute('required');
@@ -2293,7 +2247,7 @@
                     authTitle.textContent = 'Регистрация';
                     authSubmitBtn.textContent = 'Зарегистрироваться';
                     authConfirmPasswordInput.style.display = 'block';
-                    authPlayerNameInput.style.display = 'block';
+                    authPlayerNameInput.style.display = 'block'; // --- ИСПРАВЛЕНО: Показываем имя при регистрации ---
                     // ДОБАВЛЯЕМ 'required' к полям регистрации при переключении на регистрацию
                     authConfirmPasswordInput.setAttribute('required', '');
                     authPlayerNameInput.setAttribute('required', '');
@@ -2310,9 +2264,8 @@
 
                 const email = authEmailInput.value.trim();
                 const password = authPasswordInput.value;
-                // ПОЛУЧАЕМ ЗНАЧЕНИЯ ТОЛЬКО ЕСЛИ ПОЛЯ ВИДИМЫ И ОБЯЗАТЕЛЬНЫ
-                const confirmPassword = isLoginMode ? undefined : authConfirmPasswordInput.value;
-                const playerName = isLoginMode ? undefined : authPlayerNameInput.value.trim(); // Получаем имя игрока
+                const confirmPassword = isLoginMode ? undefined : authConfirmPasswordInput.value; // --- ИСПРАВЛЕНО: Получаем только если видимо ---
+                const playerName = isLoginMode ? undefined : authPlayerNameInput.value.trim(); // --- ИСПРАВЛЕНО: Получаем только если видимо ---
 
                 if (!isLoginMode) {
                     if (password !== confirmPassword) {
@@ -2329,18 +2282,18 @@
                 if (isLoginMode) {
                     result = await AuthManager.login(email, password);
                 } else {
-                    result = await AuthManager.register(email, password, playerName); // Передаём имя игрока
+                    result = await AuthManager.register(email, password, playerName); // --- ИСПРАВЛЕНО: Передаём имя игрока ---
                 }
 
                 if (result.success) {
-                    // --- КЛЮЧЕВОЕ ИЗМЕНЕНИЕ ---
-                    // После успешной аутентификации обновляем локальные данные
-                    DataManager.updateUserDataLocally(result.user); // <-- Вызываем updateUserDataLocally с полученными от сервера данными
+                    // --- ИСПРАВЛЕНО: Обновляем локальные данные после аутентификации ---
+                    DataManager.updateUserDataLocally(result.user);
 
                     authSuccessMessage.textContent = result.message;
                     setTimeout(() => {
                         authModal.style.display = 'none';
                         mainContainer.style.display = 'block';
+                        DataManager.loadUserDataFromServer(); // --- ИСПРАВЛЕНО: Загружаем данные с сервера ---
                         // Инициализируем менеджеры
                         window.warehouse = new CardWarehouse();
                         window.collectionManager = new CollectionManager();
@@ -2371,10 +2324,9 @@
                             });
                         });
 
-                        // Обновляем интерфейс с локальных данных
                         document.getElementById('user-balance').textContent = DataManager.getUserBalance();
                         document.getElementById('user-level').textContent = DataManager.getUserLevel();
-                        document.getElementById('profile-name').textContent = DataManager.getPlayerName();
+                        document.getElementById('profile-name').textContent = DataManager.getPlayerName(); // --- ИСПРАВЛЕНО: Обновляем имя при входе ---
                     }, 1500);
                 } else {
                     authMessage.textContent = result.message;
@@ -2386,7 +2338,6 @@
                 AuthManager.logout();
             });
         });
-        // ========== КОНЕЦ ВСЕГО JAVASCRIPT КОДА ==========
     </script>
 </body>
 </html>
