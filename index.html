@@ -755,7 +755,6 @@
                 grid-template-columns: 1fr;
             }
         }
-
         /* Стили для модального окна аутентификации */
         .auth-modal {
             position: fixed;
@@ -832,7 +831,8 @@
             <form id="auth-form" class="auth-form">
                 <input type="email" id="auth-email" class="auth-input" placeholder="Email" required>
                 <input type="password" id="auth-password" class="auth-input" placeholder="Пароль" required>
-                <input type="password" id="auth-confirm-password" class="auth-input" placeholder="Подтвердите пароль" style="display: none;">
+                <!-- ВАЖНО: Поле подтверждения пароля и имя игрока теперь всегда есть в HTML, но скрываются/показываются -->
+                <input type="password" id="auth-confirm-password" class="auth-input" placeholder="Подтвердите пароль" style="display: none;" required>
                 <input type="text" id="auth-player-name" class="auth-input" placeholder="Имя игрока" style="display: none;" required>
                 <button type="submit" class="auth-btn" id="auth-submit-btn">Войти</button>
             </form>
@@ -1080,7 +1080,7 @@
             }
 
             static async register(email, password, playerName) {
-                // --- ИСПРАВЛЕНО: Получаем значение из поля подтверждения ---
+                // Получаем значение из поля подтверждения пароля
                 const confirmPassword = document.getElementById('auth-confirm-password').value;
 
                 try {
@@ -1089,14 +1089,14 @@
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        // --- ИСПРАВЛЕНО: Отправляем playerName и confirmPassword ---
-                        body: JSON.stringify({ email, password, playerName, confirmPassword }),
+                        // Отправляем все 4 поля:
+                        body: JSON.stringify({ email, password, playerName, confirmPassword }), // <-- Добавлен playerName и confirmPassword
                     });
 
                     const data = await response.json();
                     if (response.ok) {
                         this.setAuthToken(data.token);
-                        DataManager.updateUserDataLocally(data.user);
+                        DataManager.updateUserDataLocally(data.user); // Обновляем локальные данные
                         return { success: true, message: data.message };
                     } else {
                         return { success: false, message: data.error || 'Ошибка регистрации' };
@@ -1120,7 +1120,7 @@
                     const data = await response.json();
                     if (response.ok) {
                         this.setAuthToken(data.token);
-                        DataManager.updateUserDataLocally(data.user);
+                        DataManager.updateUserDataLocally(data.user); // Обновляем локальные данные
                         return { success: true, message: data.message };
                     } else {
                         return { success: false, message: data.error || 'Ошибка входа' };
@@ -1148,15 +1148,15 @@
                     }
                 }
                 this.clearAuthToken();
-                DataManager.clearLocalData();
+                DataManager.clearLocalData(); // Очищаем локальные данные
                 window.location.reload(); // Перезагружаем страницу, чтобы показать форму входа
             }
         }
 
-        // ========== СИСТЕМА ХРАНЕНИЯ ДАННЫХ (ИСПРАВЛЕНО) ==========
+        // ========== СИСТЕМА ХРАНЕНИЯ ДАННЫХ (ИСПРАВЛЕНО И ДОПОЛНЕНО) ==========
         class DataManager {
             static initialize() {
-                // Инициализация localStorage
+                // Инициализация localStorage (если нужно)
                 if (!localStorage.getItem('nftCollection')) localStorage.setItem('nftCollection', '[]');
                 if (!localStorage.getItem('battleDeck')) localStorage.setItem('battleDeck', '[]');
                 if (!localStorage.getItem('userBalance')) localStorage.setItem('userBalance', '0');
@@ -1164,12 +1164,12 @@
                 if (!localStorage.getItem('playerStats')) localStorage.setItem('playerStats', JSON.stringify({ totalWins: 0, totalLosses: 0, currentStreak: 0, bestStreak: 0, totalBattles: 0 }));
                 if (!localStorage.getItem('achievements')) localStorage.setItem('achievements', '{}');
                 if (!localStorage.getItem('dailyQuests')) localStorage.setItem('dailyQuests', JSON.stringify({ quests: [], lastClaimedDate: null }));
-                if (!localStorage.getItem('aiDeck')) localStorage.setItem('aiDeck', '[]');
-                // --- ИСПРАВЛЕНО: Инициализация playerName ---
-                if (!localStorage.getItem('playerName')) localStorage.setItem('playerName', 'Игрок');
+                if (!localStorage.getItem('aiDeck')) localStorage.setItem('aiDeck', '[]'); // Для ИИ
+                if (!localStorage.getItem('playerName')) localStorage.setItem('playerName', 'Игрок'); // Добавлено для имени игрока
             }
 
-            // --- ИСПРАВЛЕНО: Добавлен метод updateUserDataLocally ---
+            // Метод для ОБНОВЛЕНИЯ локальных данных ПОСЛЕ успешной аутентификации (регистрации или входа)
+            // Принимает данные, полученные от сервера в ответе на /auth/register или /auth/login
             static updateUserDataLocally(userDataFromServer) {
                 localStorage.setItem('userBalance', userDataFromServer.balance.toString());
                 localStorage.setItem('userLevel', userDataFromServer.level.toString());
@@ -1184,15 +1184,18 @@
                 }));
                 localStorage.setItem('achievements', JSON.stringify(userDataFromServer.achievements || {}));
                 localStorage.setItem('dailyQuests', JSON.stringify(userDataFromServer.quests || []));
-                // --- ИСПРАВЛЕНО: Обновляем имя игрока ---
+                // Обновляем имя игрока
                 localStorage.setItem('playerName', userDataFromServer.playerName || 'Игрок');
-                // Обновляем интерфейс
-                document.getElementById('user-balance').textContent = userDataFromServer.balance;
-                document.getElementById('user-level').textContent = userDataFromServer.level;
-                document.getElementById('profile-name').textContent = userDataFromServer.playerName || 'Игрок';
+
+                // Обновляем интерфейс ТОЛЬКО если элементы существуют
+                const balanceElement = document.getElementById('user-balance');
+                const levelElement = document.getElementById('user-level');
+                const profileNameElement = document.getElementById('profile-name');
+                if (balanceElement) balanceElement.textContent = userDataFromServer.balance;
+                if (levelElement) levelElement.textContent = userDataFromServer.level;
+                if (profileNameElement) profileNameElement.textContent = userDataFromServer.playerName || 'Игрок';
             }
 
-            // --- ИСПРАВЛЕНО: Добавлен метод clearLocalData ---
             static clearLocalData() {
                 localStorage.removeItem('nftCollection');
                 localStorage.removeItem('battleDeck');
@@ -1201,11 +1204,11 @@
                 localStorage.removeItem('playerStats');
                 localStorage.removeItem('achievements');
                 localStorage.removeItem('dailyQuests');
-                // --- ИСПРАВЛЕНО: Удаляем имя игрока ---
-                localStorage.removeItem('playerName');
+                localStorage.removeItem('aiDeck');
+                localStorage.removeItem('playerName'); // Очищаем имя игрока
             }
 
-            // --- ИСПРАВЛЕНО: Добавлен метод loadUserDataFromServer ---
+            // Метод для ЗАГРУЗКИ данных С СЕРВЕРА при ПЕРВОЙ ЗАГРУЗКЕ СТРАНИЦЫ (если пользователь уже авторизован)
             static async loadUserDataFromServer() {
                 const token = AuthManager.getAuthToken();
                 if (!token) return;
@@ -1220,7 +1223,7 @@
 
                     if (response.ok) {
                         const userData = await response.json();
-                        this.updateUserDataLocally(userData);
+                        this.updateUserDataLocally(userData); // Обновляем локальные данные из ответа сервера
                         // Перезагружаем компоненты, которые зависят от данных
                         if (typeof warehouse !== 'undefined') warehouse.renderCards();
                         if (typeof collectionManager !== 'undefined') collectionManager.renderCollection();
@@ -1229,11 +1232,13 @@
                         if (typeof dailyQuestsManager !== 'undefined') dailyQuestsManager.renderQuests();
                     } else {
                         console.error('Ошибка загрузки профиля при загрузке:', response.status);
+                        // Токен может быть недействителен, разлогиниваем
                         AuthManager.logout();
                     }
                 } catch (error) {
                     console.error('Ошибка загрузки профиля при загрузке:', error);
-                    // AuthManager.logout(); // Опционально
+                    // Опционально: разлогинить при сетевой ошибке
+                    // AuthManager.logout();
                 }
             }
 
@@ -1250,20 +1255,54 @@
                     cardData.price
                 ));
             }
-            static addToCollection(card) {
+            // !!! СИНХРОНИЗАЦИЯ С СЕРВЕРОМ !!!
+            static async addToCollection(card) {
                 const collection = this.getCollection();
                 if (!collection.find(c => c.id === card.id)) {
                     collection.push(card);
                     localStorage.setItem('nftCollection', JSON.stringify(collection));
+                    // --- ОТПРАВКА ИЗМЕНЕНИЯ НА СЕРВЕР ---
+                    const token = AuthManager.getAuthToken();
+                    if (token) {
+                        try {
+                            await fetch(`${API_BASE_URL}/user/inventory/add`, { // Предполагаемый эндпоинт
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${token}`
+                                },
+                                body: JSON.stringify({ card: card.toJSON() })
+                            });
+                        } catch (error) {
+                            console.error("Ошибка синхронизации коллекции с сервером:", error);
+                        }
+                    }
                     return true;
                 }
                 return false;
             }
-            static removeFromCollection(cardId) {
+            // !!! СИНХРОНИЗАЦИЯ С СЕРВЕРОМ !!!
+            static async removeFromCollection(cardId) {
                 const collection = this.getCollection();
                 const newCollection = collection.filter(c => c.id !== cardId);
                 localStorage.setItem('nftCollection', JSON.stringify(newCollection));
-                this.removeFromBattleDeck(cardId);
+                this.removeFromBattleDeck(cardId); // Удаляем из колоды тоже
+                // --- ОТПРАВКА ИЗМЕНЕНИЯ НА СЕРВЕР ---
+                const token = AuthManager.getAuthToken();
+                if (token) {
+                    try {
+                        await fetch(`${API_BASE_URL}/user/inventory/remove`, { // Предполагаемый эндпоинт
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ cardId })
+                        });
+                    } catch (error) {
+                        console.error("Ошибка синхронизации коллекции с сервером:", error);
+                    }
+                }
             }
             static getBattleDeck() {
                 // --- ИСПРАВЛЕНО: Добавлена проверка на null ---
@@ -1277,7 +1316,8 @@
                     cardData.price
                 ));
             }
-            static addToBattleDeck(card) {
+            // !!! СИНХРОНИЗАЦИЯ С СЕРВЕРОМ !!!
+            static async addToBattleDeck(card) {
                 const battleDeck = this.getBattleDeck();
                 if (battleDeck.length >= 5) {
                     return false;
@@ -1285,61 +1325,218 @@
                 if (!battleDeck.find(c => c.id === card.id)) {
                     battleDeck.push(card);
                     localStorage.setItem('battleDeck', JSON.stringify(battleDeck));
+                    // --- ОТПРАВКА ИЗМЕНЕНИЯ НА СЕРВЕР ---
+                    const token = AuthManager.getAuthToken();
+                    if (token) {
+                        try {
+                            await fetch(`${API_BASE_URL}/user/deck/update`, { // Предполагаемый эндпоинт
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${token}`
+                                },
+                                body: JSON.stringify({ newDeck: battleDeck.map(c => c.toJSON()) })
+                            });
+                        } catch (error) {
+                            console.error("Ошибка синхронизации боевой колоды с сервером:", error);
+                        }
+                    }
                     return true;
                 }
                 return false;
             }
-            static removeFromBattleDeck(cardId) {
+            // !!! СИНХРОНИЗАЦИЯ С СЕРВЕРОМ !!!
+            static async removeFromBattleDeck(cardId) {
                 const battleDeck = this.getBattleDeck();
                 const newDeck = battleDeck.filter(c => c.id !== cardId);
                 localStorage.setItem('battleDeck', JSON.stringify(newDeck));
+                // --- ОТПРАВКА ИЗМЕНЕНИЯ НА СЕРВЕР ---
+                const token = AuthManager.getAuthToken();
+                if (token) {
+                    try {
+                        await fetch(`${API_BASE_URL}/user/deck/remove`, { // Предполагаемый эндпоинт
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ cardId })
+                        });
+                    } catch (error) {
+                        console.error("Ошибка синхронизации боевой колоды с сервером:", error);
+                    }
+                }
             }
             static getUserBalance() {
                 return parseInt(localStorage.getItem('userBalance') || '0');
             }
-            static updateUserBalance(newBalance) {
+            // !!! СИНХРОНИЗАЦИЯ С СЕРВЕРОМ !!!
+            static async updateUserBalance(newBalance) {
                 localStorage.setItem('userBalance', newBalance.toString());
-                // Обновляем интерфейс ТОЛЬКО если элемент существует
+                // --- ОБНОВЛЕНИЕ ИНТЕРФЕЙСА ---
                 const balanceElement = document.getElementById('user-balance');
                 if (balanceElement) balanceElement.textContent = newBalance;
+                // --- ОТПРАВКА ИЗМЕНЕНИЯ НА СЕРВЕР ---
+                const token = AuthManager.getAuthToken();
+                if (token) {
+                    try {
+                        await fetch(`${API_BASE_URL}/user/balance/update`, { // Предполагаемый эндпоинт
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ newBalance })
+                        });
+                    } catch (error) {
+                        console.error("Ошибка синхронизации баланса с сервером:", error);
+                    }
+                }
             }
             static getUserLevel() {
                 return parseInt(localStorage.getItem('userLevel') || '1');
             }
-            static updateUserLevel(newLevel) {
+            // !!! СИНХРОНИЗАЦИЯ С СЕРВЕРОМ !!!
+            static async updateUserLevel(newLevel) {
                 localStorage.setItem('userLevel', newLevel.toString());
-                // Обновляем интерфейс ТОЛЬКО если элемент существует
+                // --- ОБНОВЛЕНИЕ ИНТЕРФЕЙСА ---
                 const levelElement = document.getElementById('user-level');
                 if (levelElement) levelElement.textContent = newLevel;
+                // --- ОТПРАВКА ИЗМЕНЕНИЯ НА СЕРВЕР ---
+                const token = AuthManager.getAuthToken();
+                if (token) {
+                    try {
+                        await fetch(`${API_BASE_URL}/user/level/update`, { // Предполагаемый эндпоинт
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ newLevel })
+                        });
+                    } catch (error) {
+                        console.error("Ошибка синхронизации уровня с сервером:", error);
+                    }
+                }
             }
             static getPlayerStats() {
+                // --- ИСПРАВЛЕНО: Добавлена проверка на null ---
                 return JSON.parse(localStorage.getItem('playerStats') || '{"totalWins": 0, "totalLosses": 0, "currentStreak": 0, "bestStreak": 0, "totalBattles": 0}');
             }
-            static updatePlayerStats(stats) {
+            // !!! СИНХРОНИЗАЦИЯ С СЕРВЕРОМ !!!
+            static async updatePlayerStats(stats) {
                 localStorage.setItem('playerStats', JSON.stringify(stats));
+                // --- ОТПРАВКА ИЗМЕНЕНИЯ НА СЕРВЕР ---
+                const token = AuthManager.getAuthToken();
+                if (token) {
+                    try {
+                        await fetch(`${API_BASE_URL}/user/stats/update`, { // Предполагаемый эндпоинт
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ stats })
+                        });
+                    } catch (error) {
+                        console.error("Ошибка синхронизации статистики с сервером:", error);
+                    }
+                }
             }
             static getAchievements() {
+                // --- ИСПРАВЛЕНО: Добавлена проверка на null ---
                 return JSON.parse(localStorage.getItem('achievements') || '{}');
             }
-            static updateAchievements(achievements) {
+            // !!! СИНХРОНИЗАЦИЯ С СЕРВЕРОМ !!!
+            static async updateAchievements(achievements) {
                 localStorage.setItem('achievements', JSON.stringify(achievements));
+                // --- ОТПРАВКА ИЗМЕНЕНИЯ НА СЕРВЕР ---
+                const token = AuthManager.getAuthToken();
+                if (token) {
+                    try {
+                        await fetch(`${API_BASE_URL}/user/achievements/update`, { // Предполагаемый эндпоинт
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ achievements })
+                        });
+                    } catch (error) {
+                        console.error("Ошибка синхронизации достижений с сервером:", error);
+                    }
+                }
             }
             static getDailyQuests() {
+                // --- ИСПРАВЛЕНО: Добавлена проверка на null ---
                 return JSON.parse(localStorage.getItem('dailyQuests') || '{"quests": [], "lastClaimedDate": null}');
             }
-            static updateDailyQuests(questsData) {
+            // !!! СИНХРОНИЗАЦИЯ С СЕРВЕРОМ !!!
+            static async updateDailyQuests(questsData) {
                 localStorage.setItem('dailyQuests', JSON.stringify(questsData));
+                // --- ОТПРАВКА ИЗМЕНЕНИЯ НА СЕРВЕР ---
+                const token = AuthManager.getAuthToken();
+                if (token) {
+                    try {
+                        await fetch(`${API_BASE_URL}/user/quests/update`, { // Предполагаемый эндпоинт
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify(questsData)
+                        });
+                    } catch (error) {
+                        console.error("Ошибка синхронизации заданий с сервером:", error);
+                    }
+                }
             }
-            // --- ИСПРАВЛЕНО: Добавлен метод getPlayerName ---
+            // --- НОВЫЙ МЕТОД: Получение имени игрока ---
             static getPlayerName() {
                 return localStorage.getItem('playerName') || 'Игрок';
             }
-            // --- ИСПРАВЛЕНО: Добавлен метод updatePlayerName ---
-            static updatePlayerName(newName) {
+            // --- НОВЫЙ МЕТОД: Обновление имени игрока (с синхронизацией) ---
+            static async updatePlayerName(newName) {
                 localStorage.setItem('playerName', newName);
-                // Обновляем интерфейс ТОЛЬКО если элемент существует
+                // --- ОБНОВЛЕНИЕ ИНТЕРФЕЙСА ---
                 const nameElement = document.getElementById('profile-name');
                 if (nameElement) nameElement.textContent = newName;
+                // --- ОТПРАВКА ИЗМЕНЕНИЯ НА СЕРВЕР ---
+                const token = AuthManager.getAuthToken();
+                if (token) {
+                    try {
+                        await fetch(`${API_BASE_URL}/user/name/update`, { // Предполагаемый эндпоинт
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ newName })
+                        });
+                    } catch (error) {
+                        console.error("Ошибка синхронизации имени игрока с сервером:", error);
+                    }
+                }
+            }
+            // --- НОВЫЙ МЕТОД: Получение колоды ИИ ---
+            static getAIDeck() {
+                // --- ИСПРАВЛЕНО: Добавлена проверка на null ---
+                const aiDeck = JSON.parse(localStorage.getItem('aiDeck') || '[]');
+                return aiDeck.map(cardData => new NFTCard(
+                    cardData.id,
+                    cardData.name,
+                    cardData.type,
+                    cardData.element,
+                    cardData.level,
+                    cardData.price
+                ));
+            }
+            // --- НОВЫЙ МЕТОД: Установка колоды ИИ ---
+            static setAIDeck(deck) {
+                const deckData = deck.map(card => card.toJSON());
+                localStorage.setItem('aiDeck', JSON.stringify(deckData));
+                // Синхронизация колоды ИИ с сервером обычно не требуется, так как она генерируется на клиенте или на сервере для конкретного боя.
+                // Но если ты хочешь хранить фиксированную колоду ИИ на сервере, добавь сюда fetch запрос.
             }
         }
 
@@ -1369,25 +1566,34 @@
                 const names = { 'fire': 'Огонь', 'water': 'Вода', 'earth': 'Земля', 'air': 'Воздух' };
                 return names[this.element] || this.element;
             }
+            // --- ИСПРАВЛЕНО: Добавлена проверка на null для isInCollection и isInBattleDeck ---
             isInCollection() {
-                // --- ИСПРАВЛЕНО: Добавлена проверка на null в DataManager.getCollection ---
                 try {
                     const collection = DataManager.getCollection();
                     return collection.some(c => c.id === this.id);
-                } catch(e) {
+                } catch (e) {
                     console.warn("Ошибка проверки isInCollection:", e);
                     return false;
                 }
             }
             isInBattleDeck() {
-                // --- ИСПРАВЛЕНО: Добавлена проверка на null в DataManager.getBattleDeck ---
                 try {
                     const battleDeck = DataManager.getBattleDeck();
                     return battleDeck.some(c => c.id === this.id);
-                } catch(e) {
+                } catch (e) {
                     console.warn("Ошибка проверки isInBattleDeck:", e);
                     return false;
                 }
+            }
+            toJSON() {
+                return {
+                    id: this.id,
+                    name: this.name,
+                    type: this.type,
+                    element: this.element,
+                    level: this.level,
+                    price: this.price
+                };
             }
         }
 
@@ -1597,7 +1803,7 @@
                 this.init();
             }
             init() {
-                DataManager.initialize(); // --- ИСПРАВЛЕНО: Вызов initialize ---
+                DataManager.initialize(); // Инициализируем DataManager перед использованием
                 this.generateAllCards(); // Генерируем все возможные карты
                 this.renderCards();
                 this.setupEventListeners();
@@ -1690,13 +1896,13 @@
                 document.getElementById('filter-level').value = 'all';
                 this.renderCards();
             }
-            buyCard(cardId) {
+            async buyCard(cardId) { // --- ИСПРАВЛЕНО: Сделан асинхронным ---
                 const card = this.cards.find(c => c.id === cardId);
                 if (card && !card.isInCollection()) {
                     const userBalance = DataManager.getUserBalance();
                     if (userBalance >= card.price) {
                         if (DataManager.addToCollection(card)) {
-                            DataManager.updateUserBalance(userBalance - card.price);
+                            await DataManager.updateUserBalance(userBalance - card.price); // --- ИСПРАВЛЕНО: await ---
                             this.renderCards();
                             collectionManager.renderCollection();
                             leaderboardManager.checkAchievements();
@@ -1708,8 +1914,9 @@
                     }
                 }
             }
-            removeFromCollection(cardId) {
+            async removeFromCollection(cardId) { // --- ИСПРАВЛЕНО: Сделан асинхронным ---
                 DataManager.removeFromCollection(cardId);
+                await DataManager.loadUserDataFromServer(); // --- ИСПРАВЛЕНО: Перезагружаем данные с сервера ---
                 this.renderCards();
                 collectionManager.renderCollection();
                 battleManager.updateBattleDeck();
@@ -1776,10 +1983,10 @@
                 document.getElementById('collection-total').textContent = collection.length;
                 document.getElementById('collection-battle').textContent = battleDeck.length;
             }
-            addToBattleDeck(cardId) {
+            async addToBattleDeck(cardId) { // --- ИСПРАВЛЕНО: Сделан асинхронным ---
                 const collection = DataManager.getCollection();
                 const card = collection.find(c => c.id === cardId);
-                if (card && DataManager.addToBattleDeck(card)) {
+                if (card && await DataManager.addToBattleDeck(card)) { // --- ИСПРАВЛЕНО: await ---
                     this.renderCollection();
                     battleManager.updateBattleDeck();
                     alert(`🃏 Карта "${card.name}" добавлена в боевую колоду!`);
@@ -1787,8 +1994,8 @@
                     alert('❌ В боевой колоде может быть не более 5 карт!');
                 }
             }
-            removeFromBattleDeck(cardId) {
-                DataManager.removeFromBattleDeck(cardId);
+            async removeFromBattleDeck(cardId) { // --- ИСПРАВЛЕНО: Сделан асинхронным ---
+                await DataManager.removeFromBattleDeck(cardId); // --- ИСПРАВЛЕНО: await ---
                 this.renderCollection();
                 battleManager.updateBattleDeck();
             }
@@ -1989,7 +2196,7 @@
                     el.classList.remove('disabled');
                 });
             }
-            endGame() {
+            async endGame() { // --- ИСПРАВЛЕНО: Сделан асинхронным ---
                 this.gameEnded = true;
                 this.isBattleActive = false;
                 const resultMessage = document.getElementById('result-message');
@@ -1999,7 +2206,7 @@
                     this.addLogEntry('Вы выиграли игру!', 'win');
                     // Награда за победу
                     const reward = 50;
-                    DataManager.updateUserBalance(DataManager.getUserBalance() + reward);
+                    await DataManager.updateUserBalance(DataManager.getUserBalance() + reward); // --- ИСПРАВЛЕНО: await ---
                     this.addLogEntry(`Получена награда: ${reward} TCR`, 'win');
                     // Обновляем задания
                     dailyQuestsManager.updateQuestProgress('battle_1');
@@ -2101,6 +2308,13 @@
                         DataManager.resetAllData();
                     }
                 });
+                // --- ДОБАВЛЕНО: Обработчик кнопки изменения имени ---
+                document.getElementById('change-name-btn').addEventListener('click', () => {
+                    const newName = prompt('Введите новое имя игрока:', DataManager.getPlayerName());
+                    if (newName && newName.trim() !== '' && newName.trim() !== DataManager.getPlayerName()) {
+                        DataManager.updatePlayerName(newName.trim());
+                    }
+                });
             }
         }
 
@@ -2112,7 +2326,7 @@
             init() {
                 // Ничего не делаем, так как вся статистика теперь в профиле
             }
-            updateStats(won) {
+            async updateStats(won) { // --- ИСПРАВЛЕНО: Сделан асинхронным ---
                 const stats = DataManager.getPlayerStats();
                 stats.totalBattles++;
                 if (won) {
@@ -2125,7 +2339,7 @@
                     stats.totalLosses++;
                     stats.currentStreak = 0;
                 }
-                DataManager.updatePlayerStats(stats);
+                await DataManager.updatePlayerStats(stats); // --- ИСПРАВЛЕНО: await ---
                 profileManager.updateProfile(); // Обновляем профиль
                 this.checkAchievements();
             }
@@ -2170,7 +2384,7 @@
 
         // ==================== ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ ====================
         document.addEventListener('DOMContentLoaded', () => {
-            DataManager.initialize(); // --- ИСПРАВЛЕНО: Вызов initialize при загрузке ---
+            DataManager.initialize(); // --- ИСПРАВЛЕНО: Инициализируем DataManager при загрузке страницы
 
             const authModal = document.getElementById('auth-modal');
             const mainContainer = document.getElementById('main-container');
@@ -2181,7 +2395,7 @@
             const authEmailInput = document.getElementById('auth-email');
             const authPasswordInput = document.getElementById('auth-password');
             const authConfirmPasswordInput = document.getElementById('auth-confirm-password');
-            const authPlayerNameInput = document.getElementById('auth-player-name'); // --- ИСПРАВЛЕНО: Добавлен элемент ---
+            const authPlayerNameInput = document.getElementById('auth-player-name');
             const authMessage = document.getElementById('auth-message');
             const authSuccessMessage = document.getElementById('auth-success-message');
             const logoutBtn = document.getElementById('logout-btn');
@@ -2226,7 +2440,7 @@
 
                 document.getElementById('user-balance').textContent = DataManager.getUserBalance();
                 document.getElementById('user-level').textContent = DataManager.getUserLevel();
-                document.getElementById('profile-name').textContent = DataManager.getPlayerName(); // --- ИСПРАВЛЕНО: Обновляем имя при загрузке ---
+                document.getElementById('profile-name').textContent = DataManager.getPlayerName();
             } else {
                 authModal.style.display = 'flex';
                 mainContainer.style.display = 'none';
@@ -2239,7 +2453,7 @@
                     authTitle.textContent = 'Вход';
                     authSubmitBtn.textContent = 'Войти';
                     authConfirmPasswordInput.style.display = 'none';
-                    authPlayerNameInput.style.display = 'none'; // --- ИСПРАВЛЕНО: Скрываем имя при входе ---
+                    authPlayerNameInput.style.display = 'none';
                     // УБИРАЕМ 'required' с полей регистрации при переключении на вход
                     authConfirmPasswordInput.removeAttribute('required');
                     authPlayerNameInput.removeAttribute('required');
@@ -2247,7 +2461,7 @@
                     authTitle.textContent = 'Регистрация';
                     authSubmitBtn.textContent = 'Зарегистрироваться';
                     authConfirmPasswordInput.style.display = 'block';
-                    authPlayerNameInput.style.display = 'block'; // --- ИСПРАВЛЕНО: Показываем имя при регистрации ---
+                    authPlayerNameInput.style.display = 'block';
                     // ДОБАВЛЯЕМ 'required' к полям регистрации при переключении на регистрацию
                     authConfirmPasswordInput.setAttribute('required', '');
                     authPlayerNameInput.setAttribute('required', '');
@@ -2264,8 +2478,9 @@
 
                 const email = authEmailInput.value.trim();
                 const password = authPasswordInput.value;
-                const confirmPassword = isLoginMode ? undefined : authConfirmPasswordInput.value; // --- ИСПРАВЛЕНО: Получаем только если видимо ---
-                const playerName = isLoginMode ? undefined : authPlayerNameInput.value.trim(); // --- ИСПРАВЛЕНО: Получаем только если видимо ---
+                // ПОЛУЧАЕМ ЗНАЧЕНИЯ ТОЛЬКО ЕСЛИ ПОЛЯ ВИДИМЫ И ОБЯЗАТЕЛЬНЫ (для регистрации)
+                const confirmPassword = isLoginMode ? undefined : authConfirmPasswordInput.value;
+                const playerName = isLoginMode ? undefined : authPlayerNameInput.value.trim(); // Получаем имя игрока
 
                 if (!isLoginMode) {
                     if (password !== confirmPassword) {
@@ -2282,18 +2497,20 @@
                 if (isLoginMode) {
                     result = await AuthManager.login(email, password);
                 } else {
-                    result = await AuthManager.register(email, password, playerName); // --- ИСПРАВЛЕНО: Передаём имя игрока ---
+                    result = await AuthManager.register(email, password, playerName); // Передаём имя игрока
                 }
 
                 if (result.success) {
-                    // --- ИСПРАВЛЕНО: Обновляем локальные данные после аутентификации ---
-                    DataManager.updateUserDataLocally(result.user);
+                    // --- КЛЮЧЕВОЕ ИЗМЕНЕНИЕ ---
+                    // После успешной аутентификации обновляем локальные данные
+                    DataManager.updateUserDataLocally(result.user); // <-- Вызываем updateUserDataLocally с полученными от сервера данными
 
                     authSuccessMessage.textContent = result.message;
                     setTimeout(() => {
                         authModal.style.display = 'none';
                         mainContainer.style.display = 'block';
-                        DataManager.loadUserDataFromServer(); // --- ИСПРАВЛЕНО: Загружаем данные с сервера ---
+                        // Загружаем данные с сервера (опционально, если register/login возвращает всё)
+                        // DataManager.loadUserDataFromServer(); // <- Закомментировано, так как updateUserDataLocally уже обновило
                         // Инициализируем менеджеры
                         window.warehouse = new CardWarehouse();
                         window.collectionManager = new CollectionManager();
@@ -2326,10 +2543,10 @@
 
                         document.getElementById('user-balance').textContent = DataManager.getUserBalance();
                         document.getElementById('user-level').textContent = DataManager.getUserLevel();
-                        document.getElementById('profile-name').textContent = DataManager.getPlayerName(); // --- ИСПРАВЛЕНО: Обновляем имя при входе ---
+                        document.getElementById('profile-name').textContent = DataManager.getPlayerName(); // Обновляем имя в профиле
                     }, 1500);
                 } else {
-                    authMessage.textContent = result.message;
+                    authMessage.textContent = result.message; // Показываем сообщение об ошибке
                 }
             });
 
